@@ -1,13 +1,11 @@
-Making R and your Phone Best Friends
-------------------------------------
+Rbot: Making R and your Phone Best Friends
+------------------------------------------
 
 ### Brief Overview
 
-This package is intended to be a simplifying tool to make R and your phone communicate, and motivate why this is a powerful combination.
+This package is intended to be a simplifying tool to make R and your phone communicate, and motivate why this is a powerful combination. Rbot is a wrapper to the APIs developed from the Telegram community, and facilitates the use of the telegram and telegram.bot apps in R.
 
-Rbot is a wrapper to the APIs developed from the Telegram community, and facilitates the use of the telegram and telegram.bot apps in R.
-
-Using this package, your workflow for setting up with your phone is as simple as 1 2 3:
+> Using this package, your workflow for setting up with your phone to talk to R is as simple as 1 2 3:
 
 1.  Install the Telegram app on your phone.
 
