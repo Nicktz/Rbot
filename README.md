@@ -102,7 +102,7 @@ If you chose the default path, your bot's information is saved under the name yo
 
 ``` r
 
-BOTNAME <- "MyBot" 
+BOTNAME <- "Nicks_Phone"
 Msg <- "Hello!"
 Text_Bot(Msg, Bot_Name = BOTNAME, Info_Loc = NULL, Token = NULL, Silent = TRUE)
 ```
@@ -111,7 +111,7 @@ You can now use messages in your R code very simply to alert you to progress, me
 
 ``` r
 
-BOTNAME <- "MyBot"
+BOTNAME <- "Sams_Phone"
     
 Text_Bot(Msg = "Analysis Started", Bot_Name = BOTNAME)
 foo(x, y)
@@ -126,14 +126,14 @@ A workflow example could look like this:
 ``` r
 
 # PDF:
-BOTNAME <- "MyRbot"
+BOTNAME <- "Charlottes_Phone"
 Doc_Loc <- "SomePDF.PDF"
 Doc_Bot(Doc_Location = Doc_Loc, Bot_Name = BOTNAME)
 ```
 
 ``` r
 
-BOTNAME <- "MyRbot"
+BOTNAME <- "Gids_Phone"
 Rmd_File <- "input.Rmd"
 
 Workflow <- function(BOTNAME, Rmd_File){

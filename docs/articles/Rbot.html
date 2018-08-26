@@ -84,17 +84,25 @@
 </blockquote>
 <ol style="list-style-type: decimal">
 <li><p>Install the <a href="https://telegram.org/">Telegram app</a> on your phone.</p></li>
-<li><p>Open the app, and then send <a href="https://core.telegram.org/bots#6-botfather">botfather</a> the message: /newbot.</p></li>
+<li>
+<p>Open the app, and then send <a href="https://core.telegram.org/bots#6-botfather">botfather</a> the message: <strong>/newbot</strong>.</p>
+<ul>
+<li>Note - you will first have to start a conversation with botfather - search for __<span class="citation">@botfather__</span> from the Chats search bar, then start conversation and type /newbot.</li>
+</ul>
+</li>
 </ol>
 <ul>
-<li>Click on the t.me/<botname>_bot link in the “Done! Congratulations…” message from botfather. Press start below and send your bot a message (“Hi Bot!”)</botname>
-</li>
+<li><p>Click on the t.me/<botname>_bot link in the “Done! Congratulations…” message from botfather. Press start below and send your bot a message (“Hi Bot!”)</botname></p></li>
+<li><p>Take note of the Token given by <span class="citation">@botfather</span>. It is a looong Token that you can easily misspell. <strong>TIP</strong>: mail this to yourself from your phone and copy Token into R (you will likely type something wrong…).</p></li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
 <li>In R, run the following code to save your bot’s credentials on your computer (assuming default locations apply):</li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Token =<span class="st"> </span>YOURTOKEN  <span class="co"># given by the Botfather... Looks like: 3148997513::AFSIBIGEk2352235mpfFA</span>
 <span class="kw"><a href="../reference/Add_Bot.html">Add_Bot</a></span>(<span class="dt">Token =</span> Token) <span class="co"># By default, this is saved in: path.expand("~")</span></code></pre></div>
+<ul>
+<li>Note: you might get a message that says you “Please first send a message to your intended bot”. Go back to Telegram and send your bot a “hi” message. If you get an error: <em>object ‘R_TELEGRAM_BOT_RBot’ not found</em>, you have misspelled your Token (very easy to do).</li>
+</ul>
 <ol start="4" style="list-style-type: decimal">
 <li>Now you can send messages, pdfs and images from R to your phone simply as follows:</li>
 </ol>
@@ -157,14 +165,14 @@ Img_Loc &lt;-<span class="st"> "Example_Plot.png"</span>
 Token =<span class="st"> </span>YOURTOKEN  <span class="co"># given by the Botfather...</span>
 <span class="kw"><a href="../reference/Add_Bot.html">Add_Bot</a></span>(<span class="dt">Token =</span> Token)</code></pre></div>
 <p>You can override the parameters to save this to a specific directory. See ?Add_Bot</p>
-<p>If you chose the default path, your bot’s information is saved under the name you entered into the console prompt, with the prefix Rbots_. you can now use the following to send messages from R to your newly created bot:</p>
+<p>If you chose the default path, your bot’s information is saved under the name you entered into the console prompt, with the prefix .Rbots_. you can now use the following to send messages from R to your newly created bot:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-BOTNAME &lt;-<span class="st"> "MyBot"</span> 
+BOTNAME &lt;-<span class="st"> "Nicks_Phone"</span>
 Msg &lt;-<span class="st"> "Hello!"</span>
 <span class="kw"><a href="../reference/Text_Bot.html">Text_Bot</a></span>(Msg, <span class="dt">Bot_Name =</span> BOTNAME, <span class="dt">Info_Loc =</span> <span class="ot">NULL</span>, <span class="dt">Token =</span> <span class="ot">NULL</span>, <span class="dt">Silent =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>You can now use messages in your R code very simply to alert you to progress, messages, errors or whatever text you desire - straight to your phone. E.g.:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-BOTNAME &lt;-<span class="st"> "MyBot"</span>
+BOTNAME &lt;-<span class="st"> "Sams_Phone"</span>
     
 <span class="kw"><a href="../reference/Text_Bot.html">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Started"</span>, <span class="dt">Bot_Name =</span> BOTNAME)
 <span class="kw">foo</span>(x, y)
@@ -174,11 +182,11 @@ BOTNAME &lt;-<span class="st"> "MyBot"</span>
 <p>A workflow example could look like this:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 <span class="co"># PDF:</span>
-BOTNAME &lt;-<span class="st"> "MyRbot"</span>
+BOTNAME &lt;-<span class="st"> "Charlottes_Phone"</span>
 Doc_Loc &lt;-<span class="st"> "SomePDF.PDF"</span>
 <span class="kw"><a href="../reference/Doc_Bot.html">Doc_Bot</a></span>(<span class="dt">Doc_Location =</span> Doc_Loc, <span class="dt">Bot_Name =</span> BOTNAME)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-BOTNAME &lt;-<span class="st"> "MyRbot"</span>
+BOTNAME &lt;-<span class="st"> "Gids_Phone"</span>
 Rmd_File &lt;-<span class="st"> "input.Rmd"</span>
 
 Workflow &lt;-<span class="st"> </span><span class="cf">function</span>(BOTNAME, Rmd_File){
