@@ -77,7 +77,7 @@
 <p>Using this package, your workflow for setting up with your phone to talk to R is as simple as 1 2 3 4:</p>
 </blockquote>
 <ol style="list-style-type: decimal">
-<li><p>Install the Telegram app on your phone.</p></li>
+<li><p>Install the <a href="https://telegram.org/">Telegram app</a> on your phone.</p></li>
 <li><p>Open the app, and then send <a href="https://core.telegram.org/bots#6-botfather">botfather</a> the message: /newbot.</p></li>
 </ol>
 <ul>
@@ -115,56 +115,87 @@ Img_Loc &lt;-<span class="st"> "Example_Plot.png"</span>
 <div id="detailed-overview" class="section level4">
 <h4 class="hasAnchor">
 <a href="#detailed-overview" class="anchor"></a>Detailed Overview</h4>
-<p>This package makes it easy to manage R from your phone using the Telegram App on your phone. You should be ready to go in less than a minute provided you:</p>
+<p><strong>Rbot</strong> is a simplified wrapper package that shows a workflow to make it easy to communicate with R from your phone using the <a href="https://telegram.org/">Telegram App</a>. You should be ready to go in less than a minute provided you:</p>
 <ul>
 <li><p>Have the telegram app installed on your phone.</p></li>
-<li><p>Messag botfather (he will appear amongst your contacts automatically) the following:</p></li>
+<li><p>Message botfather (he will appear amongst your contacts automatically) the following:</p></li>
 </ul>
 <blockquote>
 <p>/newbot</p>
 </blockquote>
 <ul>
 <li>
-<p>Now simply follow instructions from the Botfather and create a new bot.</p>
+<p>Now simply follow instructions from the Botfather (on your phone in the Telegram app) and create a new bot.</p>
 <ul>
 <li><p>Then, take note of the <strong>Token</strong> botfather provided, and click on the link: t.me/<yourbotname> in the confirmation message from botfather.</yourbotname></p></li>
 <li><p>This takes you to the bot. Hit start, and send the bot a simple message to initialise your chat (simply type “hi”).</p></li>
-<li><p>You can check the validity of your bot by typing into a browser (replacing YOURTOKEN with your token…): <a href="https://api.telegram.org/botYOURTOKEN/getMe" class="uri">https://api.telegram.org/botYOURTOKEN/getMe</a>.</p></li>
+<li><p>You can check the validity of your bot by typing into a browser on your computer (replacing YOURTOKEN with your token…): <a href="https://api.telegram.org/botYOURTOKEN/getMe" class="uri">https://api.telegram.org/botYOURTOKEN/getMe</a>.</p></li>
 <li><p>If the browser does not give you an error message, it is a valid bot. It should also show you the bot name and bot username.</p></li>
+<li><p>Telegram bots can receive messages or commands. Commands are always prefixed with a / character (e.g. when you told botfather /newbot).</p></li>
 </ul>
 </li>
 </ul>
 <blockquote>
-<p>Now simply remember your Token…and try the functions below!</p>
+<p>Now… simply remember your Token, and try the functions below.</p>
 </blockquote>
 </div>
 </div>
 <div id="add_bot" class="section level2">
 <h2 class="hasAnchor">
 <a href="#add_bot" class="anchor"></a>Add_Bot</h2>
-<p>This function makes it easy to store all the needed information from your bot for communication from R, to your computer.</p>
-<p>This makes it easier to use your bots, as you will be otherwise required to always input Tokens and IDs (which could be a kill-joy).</p>
-<p>This little function will, by default, use the <strong>path.expand(“~”)</strong> location on your computer, but this can be overridden by setting path below.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Check where this is located on your computer:</span>
-<span class="kw">path.expand</span>(<span class="st">"~"</span>)</code></pre></div>
-<p>Now, you can save your bot’s information as follows (you will be prompted to enter your bot’s name that appears in your console…):</p>
+<p>The Add_Bot function makes it easy to store all the needed information of your Telegram bots required for communication from and to R.</p>
+<p>This makes it much easier to make use of your bots in R code, as you will otherwise be required to always input Tokens and IDs (which is not easy to memorize).</p>
+<p>This little helper function will, by default, use the <strong>path.expand(“~”)</strong> location on your computer, but this can be overridden by using the <strong>Info_Loc</strong> argument and specifying your ideal path.</p>
+<p>Let’s save your bot’s information as follows (you will be prompted to enter a name to identify this bot from your R console when running this function…):</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
 Token =<span class="st"> </span>YOURTOKEN  <span class="co"># given by the Botfather...</span>
 <span class="kw"><a href="reference/Add_Bot.html">Add_Bot</a></span>(<span class="dt">Token =</span> Token)</code></pre></div>
 <p>You can override the parameters to save this to a specific directory. See ?Add_Bot</p>
-<p>If you chose the default, and your bot’s name is: <strong>BOTNAME</strong>, you can now use the following to send messages from R to your bot:</p>
+<p>If you chose the default path, your bot’s information is saved under the name you entered into the console prompt, with the prefix Rbots_. you can now use the following to send messages from R to your newly created bot:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+BOTNAME &lt;-<span class="st"> "MyBot"</span> 
 Msg &lt;-<span class="st"> "Hello!"</span>
 <span class="kw"><a href="reference/Text_Bot.html">Text_Bot</a></span>(Msg, <span class="dt">Bot_Name =</span> BOTNAME, <span class="dt">Info_Loc =</span> <span class="ot">NULL</span>, <span class="dt">Token =</span> <span class="ot">NULL</span>, <span class="dt">Silent =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p>You can now use messages in your workflow simply, e.g.:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Bot_Name &lt;-<span class="st"> "xxxx"</span>
+<p>You can now use messages in your R code very simply to alert you to progress, messages, errors or whatever text you desire - straight to your phone. E.g.:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+BOTNAME &lt;-<span class="st"> "MyBot"</span>
     
-<span class="kw"><a href="reference/Text_Bot.html">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Started"</span>, Bot_Name)
+<span class="kw"><a href="reference/Text_Bot.html">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Started"</span>, <span class="dt">Bot_Name =</span> BOTNAME)
 <span class="kw">foo</span>(x, y)
 <span class="kw">foo2</span>(x, y)
-<span class="kw"><a href="reference/Text_Bot.html">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Ended"</span>, Bot_Name)</code></pre></div>
-<p>Or of course even send yourself pdf versions of your markdown files after it is built, or figures of your ggplots.</p>
-<p>The possibility of using these wrappers is endless.</p>
+<span class="kw"><a href="reference/Text_Bot.html">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Ended"</span>, <span class="dt">Bot_Name =</span> BOTNAME)</code></pre></div>
+<p>Or you can send yourself pdf versions of your rmarkdown files after it is built, or figures produced using ggplot.</p>
+<p>A workflow example could look like this:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># PDF:</span>
+BOTNAME &lt;-<span class="st"> "MyRbot"</span>
+Doc_Loc &lt;-<span class="st"> "SomePDF.PDF"</span>
+<span class="kw"><a href="reference/Doc_Bot.html">Doc_Bot</a></span>(<span class="dt">Doc_Location =</span> Doc_Loc, <span class="dt">Bot_Name =</span> BOTNAME)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+BOTNAME &lt;-<span class="st"> "MyRbot"</span>
+Rmd_File &lt;-<span class="st"> "input.Rmd"</span>
+
+Workflow &lt;-<span class="st"> </span><span class="cf">function</span>(BOTNAME, Rmd_File){
+
+<span class="co"># Monthly Report generator function</span>
+  
+Rbot<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/Rbot/topics/Text_Bot">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"Analysis Started"</span>, <span class="dt">Bot_Name =</span> BOTNAME)
+
+<span class="co"># Quickly create a sanity check figure (which will be deleted after)  </span>
+<span class="kw">png</span>(<span class="st">'Example_Plot.png'</span>)
+<span class="kw">plot</span>(<span class="kw">rnorm</span>(<span class="dv">100</span>))
+<span class="kw">dev.off</span>()
+Rbot<span class="op">::</span><span class="kw">Pic_Bot</span>(<span class="dt">Img_Loc =</span> <span class="st">"Example_Plot.png"</span>, <span class="dt">Caption =</span> <span class="st">"Check Figure that appears in pdf file."</span>, <span class="dt">Bot_Name =</span> BOTNAME)
+<span class="kw">rm</span>(<span class="st">"Example_Plot.png"</span>)
+
+rmarkdown<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/rmarkdown/topics/render">render</a></span>(Rmd_File, <span class="st">"pdf_document"</span>)  
+Rbot<span class="op">::</span><span class="kw">Doc_Bot</span>(<span class="dt">Doc_Location =</span> <span class="kw">gsub</span>(<span class="st">"Rmd"</span>, <span class="st">"pdf"</span>, Rmd_File), <span class="dt">Bot_Name =</span> BOTNAME)
+Rbot<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/Rbot/topics/Text_Bot">Text_Bot</a></span>(<span class="dt">Msg =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">Analysis complete. Please check pdf built prior to sending out to clients.</span><span class="ch">\n\n</span><span class="st"> * Email me at: UseR@gmail.com if something does not look accurate."</span>, <span class="dt">Bot_Name =</span> BOTNAME)
+
+}
+
+
+<span class="kw">Workflow</span>(BOTNAME, Rmd_File)</code></pre></div>
 </div>
 <div id="show_bot" class="section level2">
 <h2 class="hasAnchor">
@@ -211,8 +242,10 @@ y &lt;-<span class="st"> </span><span class="dv">20</span>
 
 Function_List<span class="op">$</span>Foo1 &lt;-
 <span class="kw">list</span>(<span class="dt">Function =</span> First_Foo,
-<span class="dt">Call =</span> <span class="st">"F1"</span>,  <span class="co"># How to call your function from Telegram</span>
-<span class="dt">Message =</span> <span class="st">"First function executed. This function sources the data fetch."</span>)    <span class="co"># What to say when executed in Telegram</span>
+     <span class="co"># How to call your function from Telegram</span>
+     <span class="dt">Call =</span> <span class="st">"F1"</span>,  
+     <span class="co"># What to say when executed in Telegram</span>
+     <span class="dt">Message =</span> <span class="st">"First function executed. This function sources the data fetch."</span>)    
 
 Second_Foo &lt;-<span class="st"> </span><span class="cf">function</span>(){
 
@@ -225,8 +258,8 @@ y &lt;-<span class="st"> </span><span class="dv">20</span>
 
 Function_List<span class="op">$</span>Foo2 &lt;-
 <span class="kw">list</span>(<span class="dt">Function =</span> Second_Foo,
-       <span class="dt">Call =</span> <span class="st">"F2"</span>,  <span class="co"># How to call your function from Telegram</span>
-       <span class="dt">Message =</span> <span class="st">"Report is now being built."</span>)    <span class="co"># What to say when executed in Telegram</span>
+       <span class="dt">Call =</span> <span class="st">"F2"</span>,
+       <span class="dt">Message =</span> <span class="st">"Report is now being built."</span>)
 
 
 
@@ -238,60 +271,25 @@ Error_Foo &lt;-<span class="st"> </span><span class="cf">function</span>(){
 
 Function_List<span class="op">$</span>FooError &lt;-
 <span class="kw">list</span>(<span class="dt">Function =</span> Error_Foo,
-<span class="dt">Call =</span> <span class="st">"Error_Exmple"</span>,  <span class="co"># How to call your function from Telegram</span>
-<span class="dt">Message =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">Error function illustrated: </span><span class="ch">\n</span><span class="st">This illustrates that the connection with the phone will  be preserved using purrr::safely"</span>)    <span class="co"># What to say when executed in Telegram</span>
+     <span class="dt">Call =</span> <span class="st">"Error_Example"</span>, 
+     <span class="dt">Message =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">Error function illustrated: </span><span class="ch">\n</span><span class="st">This illustrates that the connection with the phone will  be preserved using purrr::safely"</span>) 
 
 
 
  Bot_Name &lt;-<span class="st"> "Gobot"</span>
- <span class="kw"><a href="reference/Foo_Bot.html">Foo_Bot</a></span>(<span class="dt">Bot_Name =</span> Bot_Name, <span class="dt">Function_List =</span> Function_List, <span class="dt">LoadMessage =</span> <span class="st">"My connection with R"</span> )
+ <span class="kw"><a href="reference/Foo_Bot.html">Foo_Bot</a></span>(<span class="dt">Bot_Name =</span> Bot_Name, <span class="dt">Function_List =</span> Function_List, <span class="dt">LoadMessage =</span> <span class="st">"My connection with R"</span>, 
+         <span class="dt">KillR =</span> <span class="ot">TRUE</span>, <span class="dt">KillCPU =</span> <span class="ot">FALSE</span>)
     </code></pre></div>
 <div id="safe-functions" class="section level4">
 <h4 class="hasAnchor">
 <a href="#safe-functions" class="anchor"></a>Safe functions</h4>
 <ul>
 <li><p>The functions above are safe - implying an error will not break the connection.</p></li>
-<li><p>Using the purrr package’s safely call, it will produce an error message, while keeping the connection open.</p></li>
-<li><p>See the silly example below.</p></li>
+<li><p>You can see e.g. when running the third function call: <strong>/Error_Example</strong>, it gives you an error, but keeps open the connection.</p></li>
 </ul>
 <blockquote>
-<p>Also note, in this example I add the command to restart R (as opposed to simply stopping connection), as well as a command to shut down the computer:</p>
+<p>Also note, you can restart R with KillR, or even switch off your computer completely by setting KillCPU to TRUE, and typing /killCPU. Take caution - this is a no questions asked shutdown of your pc - great for use on public computers where you are, e.g., downloading data from remotely.</p>
 </blockquote>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-Function_List &lt;-<span class="st"> </span><span class="kw">list</span>()
-
-Error_Foo &lt;-<span class="st"> </span><span class="cf">function</span>(){
-
-<span class="kw">log</span>(a)
-<span class="kw">print</span>(<span class="st">"....Message 1 executed...."</span>)
-
-}
-
-Function_List<span class="op">$</span>Foo1 &lt;-
-<span class="kw">list</span>(<span class="dt">Function =</span> Error_Foo,
-<span class="dt">Call =</span> <span class="st">"Error_func"</span>,  <span class="co"># How to call your function from Telegram</span>
-<span class="dt">Message =</span> <span class="st">"First function executed."</span>)    <span class="co"># What to say when executed in Telegram</span>
-
-Second_Foo &lt;-<span class="st"> </span><span class="cf">function</span>(){
-
-x &lt;-<span class="st"> </span><span class="dv">100</span>
-y &lt;-<span class="st"> </span><span class="dv">20</span>
-
-<span class="kw">print</span>(<span class="st">"....Message 2 executed...."</span>)
-}
-
-Function_List<span class="op">$</span>Foo2 &lt;-
-<span class="kw">list</span>(<span class="dt">Function =</span> Second_Foo,
-       <span class="dt">Call =</span> <span class="st">"F2"</span>,  <span class="co"># How to call your function from Telegram</span>
-       <span class="dt">Message =</span> <span class="st">"Report is now being built."</span>)    <span class="co"># What to say when executed in Telegram</span>
-
- Bot_Name &lt;-<span class="st"> "NewBot"</span>
- <span class="kw"><a href="reference/Foo_Bot.html">Foo_Bot</a></span>(<span class="dt">Bot_Name =</span> Bot_Name, <span class="dt">Function_List =</span> Function_List, <span class="dt">LoadMessage =</span> <span class="st">"My connection with R"</span>, <span class="dt">KillR =</span> <span class="ot">TRUE</span>, <span class="dt">KillCPU =</span> <span class="ot">TRUE</span> )</code></pre></div>
-</div>
-<div id="source-functions" class="section level4">
-<h4 class="hasAnchor">
-<a href="#source-functions" class="anchor"></a>Source functions</h4>
-<p>Ideally, you should use foo_bot to source R scripts that achieve your intended goals.</p>
 </div>
 <div id="more" class="section level4">
 <h4 class="hasAnchor">
