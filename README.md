@@ -1,11 +1,11 @@
 Rbot: Making R and your Phone Best Friends
 ------------------------------------------
 
-### Brief Overview
+#### Brief Overview
 
 This package is intended to be a simplifying tool to make R and your phone communicate, and motivate why this is a powerful combination. Rbot is a wrapper to the APIs developed from the Telegram community, and facilitates the use of the telegram and telegram.bot apps in R.
 
-> Using this package, your workflow for setting up with your phone to talk to R is as simple as 1 2 3:
+> Using this package, your workflow for setting up with your phone to talk to R is as simple as 1 2 3 4:
 
 1.  Install the Telegram app on your phone.
 
@@ -49,7 +49,7 @@ Pic_Bot(Img_Loc = Img_Loc, Caption = "Cool Figure Right?", Bot_Name = BOTNAME)
 
 -   The package also has a workflow for opening a connection that allow you to execute functions in R from your phone - see the next section.
 
-### Detailed Overview
+#### Detailed Overview
 
 This package makes it easy to manage R from your phone using the Telegram App on your phone. You should be ready to go in less than a minute provided you:
 
@@ -260,7 +260,7 @@ list(Function = Second_Foo,
 
 Ideally, you should use foo\_bot to source R scripts that achieve your intended goals.
 
-### More
+#### More
 
 For more details on the functions, use: ?<FunctionName>
 
