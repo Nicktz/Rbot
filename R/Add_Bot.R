@@ -42,9 +42,9 @@ if(missing(Token)) {
 
   if(!is.null(File_Name_Used)){
 
-  if(file.exists(file.path(glue::glue("{Info_Loc}/Rbots_{File_Name_Used}.rds"))) ){
+  if(file.exists(file.path(glue::glue("{Info_Loc}/.Rbots_{File_Name_Used}.rds"))) ){
 
-    Continue <- readline(prompt = cat(glue::glue("\n\nFile {Info_Loc}/Rbots_{File_Name_Used}.rds already exists.\n Are you sure you want to continue overriding the old file?\nPress Enter to continue, or Escape to escape.\n")))
+    Continue <- readline(prompt = cat(glue::glue("\n\nFile {Info_Loc}/.Rbots_{File_Name_Used}.rds already exists.\n Are you sure you want to continue overriding the old file?\nPress Enter to continue, or Escape to escape.\n")))
 
   }
 
@@ -68,7 +68,7 @@ if(missing(Token)) {
 
       if(is.null(File_Name_Used)) File_Name_Used <- BotName_ToUse
 
-      SaveLoc <- glue::glue("{Info_Loc}/Rbots_{File_Name_Used}.rds")
+      SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{File_Name_Used}.rds")
 
       SaveEntry <- list()
       SaveEntry$Description <- glue::glue("This is the bot identifyer for bot call:

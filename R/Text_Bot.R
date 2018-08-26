@@ -37,10 +37,10 @@ Text_Bot <- function(Msg, Bot_Name = NULL, Info_Loc = NULL, Token = NULL, Silent
 
   if( !is.null(Bot_Name) & is.null(Token)) {
 
-    if(!file.exists(glue::glue("{Info_Loc}/Rbots_{Bot_Name}.rds"))) stop(glue::glue("\n==============\n\nPlease check whether you added a valid Bot info using Add_Bot.\nI looked in: {Info_Loc}/{Bot_Name}.rds, but did not find a file.\n\nCheck the location ({Info_Loc}), or Bot_Name ({Bot_Name}) provided.\n==============\n") )
+    if(!file.exists(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) stop(glue::glue("\n==============\n\nPlease check whether you added a valid Bot info using Add_Bot.\nI looked in: {Info_Loc}/{Bot_Name}.rds, but did not find a file.\n\nCheck the location ({Info_Loc}), or Bot_Name ({Bot_Name}) provided.\n==============\n") )
 
     Bot_Info <-
-      readRDS(glue::glue("{Info_Loc}/Rbots_{Bot_Name}.rds"))
+      readRDS(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))
 
     Token <- Bot_Info$Token
     ID <- Bot_Info$ID

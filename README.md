@@ -15,12 +15,16 @@ This package is intended to be a simplifying tool to make R and your phone commu
 
 -   Click on the t.me/<BotName>\_bot link in the "Done! Congratulations..." message from botfather. Press start below and send your bot a message ("Hi Bot!")
 
+-   Take note of the Token given by @botfather. It is a looong Token that you can easily misspell. **TIP**: mail this to yourself from your phone and copy Token into R (you will likely type something wrong...).
+
 1.  In R, run the following code to save your bot's credentials on your computer (assuming default locations apply):
 
 ``` r
 Token = YOURTOKEN  # given by the Botfather... Looks like: 3148997513::AFSIBIGEk2352235mpfFA
 Add_Bot(Token = Token) # By default, this is saved in: path.expand("~")
 ```
+
+-   Note: you might get a message that says you "Please first send a message to your intended bot". Go back to Telegram and send your bot a "hi" message. If you get an error: *object 'R\_TELEGRAM\_BOT\_RBot' not found*, you have misspelled your Token (very easy to do).
 
 1.  Now you can send messages, pdfs and images from R to your phone simply as follows:
 
@@ -94,7 +98,7 @@ Add_Bot(Token = Token)
 
 You can override the parameters to save this to a specific directory. See ?Add\_Bot
 
-If you chose the default path, your bot's information is saved under the name you entered into the console prompt, with the prefix Rbots\_. you can now use the following to send messages from R to your newly created bot:
+If you chose the default path, your bot's information is saved under the name you entered into the console prompt, with the prefix .Rbots\_. you can now use the following to send messages from R to your newly created bot:
 
 ``` r
 
