@@ -9,7 +9,9 @@ This package is intended to be a simplifying tool to make R and your phone commu
 
 1.  Install the [Telegram app](https://telegram.org/) on your phone.
 
-2.  Open the app, and then send [botfather](https://core.telegram.org/bots#6-botfather) the message: /newbot.
+2.  Open the app, and then send [botfather](https://core.telegram.org/bots#6-botfather) the message: **/newbot**.
+
+    -   Note - you will first have to start a conversation with botfather - search for \_\_@botfather\_\_ from the Chats search bar, then start conversation and type /newbot.
 
 -   Click on the t.me/<BotName>\_bot link in the "Done! Congratulations..." message from botfather. Press start below and send your bot a message ("Hi Bot!")
 
