@@ -2,7 +2,7 @@ Package: Rbot
 Version: 1.0.1
 Date: 2018-08-07
 Type: Package
-Title: Send messages and execute functions in R from your cellphone using the Telegram App
+Title: Send Messages and Execute Functions in R from your Cellphone using the Telegram App
 Authors@R: person("Nico", "Katzke", role = c("aut", "cre"), email = "nfkatzke@gmail.com")
 Description: Send messages from R to your phone, as well as execute functions in R
     using the powerful Telegram app. This package functions as a wrapper to simplify
@@ -10,7 +10,7 @@ Description: Send messages from R to your phone, as well as execute functions in
     for executing functions in scripts.
 Maintainer: Nico Katzke <nfkatzke@gmail.com>
 BugReports: https://github.com/nicktz/Rbot/issues
-URL: http://Rbot.nfkatzke.com
+URL: https://curiousquant.com/Rbot
 Depends:
     R (>= 3.4.0)
 Imports:

@@ -102,7 +102,7 @@ If you chose the default path, your bot's information is saved under the name yo
 
 ``` r
 
-BOTNAME <- "Nicks_Phone"
+BOTNAME <- "Nicks_Phone" # You can of course assign a bot to a phone
 Msg <- "Hello!"
 Text_Bot(Msg, Bot_Name = BOTNAME, Info_Loc = NULL, Token = NULL, Silent = TRUE)
 ```
@@ -267,6 +267,6 @@ list(Function = Error_Foo,
 
 #### More
 
-For more details on the functions, use: ?<FunctionName>
+For more details on the functions, use: ?FunctionName
 
 I hope you enjoy the teamwork from R and your phone from now on. You are welcome to submit any additions to this package on github.
