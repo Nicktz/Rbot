@@ -63,7 +63,7 @@
       <h1>Rbot Vignette</h1>
                         <h4 class="author">Nico Katzke</h4>
             
-            <h4 class="date">2018-08-26</h4>
+            <h4 class="date">2018-08-27</h4>
       
       
       <div class="hidden name"><code>Rbot.Rmd</code></div>
@@ -167,7 +167,7 @@ Token =<span class="st"> </span>YOURTOKEN  <span class="co"># given by the Botfa
 <p>You can override the parameters to save this to a specific directory. See ?Add_Bot</p>
 <p>If you chose the default path, your bot’s information is saved under the name you entered into the console prompt, with the prefix .Rbots_. you can now use the following to send messages from R to your newly created bot:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
-BOTNAME &lt;-<span class="st"> "Nicks_Phone"</span>
+BOTNAME &lt;-<span class="st"> "Nicks_Phone"</span> <span class="co"># You can of course assign a bot to a phone</span>
 Msg &lt;-<span class="st"> "Hello!"</span>
 <span class="kw"><a href="../reference/Text_Bot.html">Text_Bot</a></span>(Msg, <span class="dt">Bot_Name =</span> BOTNAME, <span class="dt">Info_Loc =</span> <span class="ot">NULL</span>, <span class="dt">Token =</span> <span class="ot">NULL</span>, <span class="dt">Silent =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>You can now use messages in your R code very simply to alert you to progress, messages, errors or whatever text you desire - straight to your phone. E.g.:</p>
@@ -308,7 +308,7 @@ Function_List<span class="op">$</span>FooError &lt;-
 <div id="more" class="section level4">
 <h4 class="hasAnchor">
 <a href="#more" class="anchor"></a>More</h4>
-<p>For more details on the functions, use: ?<functionname></functionname></p>
+<p>For more details on the functions, use: ?FunctionName</p>
 <p>I hope you enjoy the teamwork from R and your phone from now on. You are welcome to submit any additions to this package on github.</p>
 </div>
 </div>
