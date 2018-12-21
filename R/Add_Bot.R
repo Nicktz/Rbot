@@ -100,7 +100,7 @@ if(missing(Token)) {
 
                         Type in R the following to see if it works:
 
-                        Text_Bot(Msg = 'hello from R!', Bot_Name = {SaveEntry$BotName}, Loc = '{Info_Loc}')
+                        Text_Bot(Msg = 'hello from R!', Bot_Name = '{SaveEntry$BotName}', Loc = '{Info_Loc}')
 
                         Enjoy using Telegram!
                         ==========================")
@@ -122,7 +122,7 @@ if(missing(Token)) {
 
                      E.g. run the following to verify the ease with which you can operate:
 
-                     Text_Bot(Msg = 'hello from R!', Bot_Name = {SaveEntry$BotName}, Loc = '{Info_Loc}')
+                     Text_Bot(Msg = 'hello from R!', Bot_Name = '{SaveEntry$BotName}', Loc = '{Info_Loc}')
 
                      \n\n===========================")))
       }
