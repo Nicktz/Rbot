@@ -62,7 +62,7 @@ if(missing(Token)) {
 
       BotName_ToUse <- readline(prompt = cat(glue::glue("\n\nPlease enter the Bot name that just appeared on your screen followed by Enter.\n")))
 
-      if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone (Telegram app), and then run function again...\n")
+      if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone on the Telegram app (you might need to do this again), and then run function again...\n")
 
       ID <- unique(bot$getUpdates()$message$from$id)
 
