@@ -41,17 +41,6 @@ if(is.null(Info_Loc)){
 
 }
 
-if(!is.null(Bot_Name)){
-
-  if(file.exists(file.path(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) ){
-
-    Continue <- readline(prompt = cat(glue::glue("\n\nFile {Info_Loc}/.Rbots_{Bot_Name}.rds already exists.\n Are you sure you want to continue overriding the old file?\nPress Enter to continue, or Escape to escape.\n")))
-
-  }
-
-}
-
-
 bot <- telegram.bot::Bot(token = Token)
 
 Check_Breaking_Changes <-
@@ -93,6 +82,16 @@ if(!WhoIt$is_bot) {
   }
 
   SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{BotName_ToUse}.rds")
+
+
+  Continue <- "Y"
+  if(file.exists(SaveLoc) ) Continue <- readline(prompt = cat(glue::glue("\n\nThere already exists a bot's information in location: {Info_Loc}/.Rbots_{Bot_Name}.rds.\n Are you sure you want to continue overriding the old file?\nType Y to override, N to stop\n")))
+
+  if(Continue %in% c("N", "n") ) {
+
+    message("...Did not overwrite existing Bot info...")
+
+  } else {
 
   SaveEntry <- list()
   SaveEntry$Description <- glue::glue("This is the bot identifyer for bot call:
@@ -154,4 +153,4 @@ if(!WhoIt$is_bot) {
 
 }
 
-
+}
