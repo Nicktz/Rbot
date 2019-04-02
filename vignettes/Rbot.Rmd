@@ -52,7 +52,7 @@ Add_Bot(Token = Token) # By default, this is saved in: path.expand("~")
 # Text:
 BOTNAME <- "MyRbot"
 Msg <- "Hello!"
-Text_Bot(Msg, Bot_Name = BOTNAME)
+Text_Bot(Msg, Bot_Name = BOTNAME, Silent = TRUE)
 
 ```
 
@@ -60,7 +60,7 @@ Text_Bot(Msg, Bot_Name = BOTNAME)
 # PDF:
 BOTNAME <- "MyRbot"
 Doc_Loc <- "SomePDF.PDF"
-Doc_Bot(Doc_Location = Doc_Loc, Bot_Name = BOTNAME)
+Doc_Bot(Doc_Location = Doc_Loc, Bot_Name = BOTNAME, Silent = TRUE)
 
 ```
 
@@ -72,7 +72,7 @@ dev.off()
 
 BOTNAME <- "MyRbot"
 Img_Loc <- "Example_Plot.png"
-Pic_Bot(Img_Loc = Img_Loc, Caption = "Cool Figure Right?", Bot_Name = BOTNAME)
+Pic_Bot(Img_Loc = Img_Loc, Caption = "Cool Figure Right?", Bot_Name = BOTNAME, Silent = TRUE)
 
 ```
 
@@ -224,18 +224,15 @@ If you prefer not to save your bots' Tokens on your computer, you could instead 
 
 This function offers a simple workflow for developers to open a connection between Telegram on your phone and their R consoles. 
 
-> Note running this function implies your R session will be occupied (talking to Telegram). This can be stopped from your phone or your console.
+> Note running this function implies your R session will be occupied (talking to Telegram). This can be stopped from your phone or your console, and is ideal for use on public computers or servers - where the ability to remotely control or shut down a computer is essential.
 
-The main idea behind this function is to allow you to execute a set of functions on your computer from your phone.
+The main idea behind this function is to allow you to execute a set of functions on your computer from your phone. If the function list is set to NULL (default), it simply allows the user to force switch off a computer or server at any time from your phone.
 
 Currently, the function allows you to have 10 functions, with your own calls, open for execution from your phone. 
 
-The functions will be safely executed, implying if there is an error - it will not interrupt your connection to the phone. Rather, it will show the error message on your phone, and allow you to keep the connection open.
+The functions will be __safely__ executed, implying if there is an error, it will not interrupt your connection to the phone. Rather, it will show the error message on your phone, and allow you to keep the connection open. The ability to switch you computer off completely from your phone is particularly useful when running computers unattended (e.g. from public terminals).
 
-Another useful addition - is to switch your computer completely off from your phone. This is useful when running computers unattended, specifically in public spaces (e.g. from public terminals).
-
-
-Your ability to scale this function is limited only by your imagination - e.g. using it in a workflow run from a server where your connection to a bot is constantly open. From it, you could then initialise bash scripts from R, that in turn applies production functions.
+Your ability to scale this function is limited only by your imagination - e.g. using it in a workflow run from a server where your connection to a bot is constantly open. From it, you could then initialise bash scripts from R, that in turn applies production functions, alerting you to progress from built in Text_Bot calls.
 
 Below I show a simple example, as well as an illustration of a workflow using __Foo_Bot__.
 
@@ -289,6 +286,10 @@ list(Function = Error_Foo,
 
  Bot_Name <- "Gobot"
  Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R", 
+         KillR = TRUE, KillCPU = FALSE)
+
+ # To just have the ability to shut down R or your computer, set Function_List to NULL (or omit completely):    
+ Foo_Bot(Bot_Name = Bot_Name, LoadMessage = "My connection with R", 
          KillR = TRUE, KillCPU = FALSE)
     
 ```

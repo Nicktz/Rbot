@@ -52,8 +52,6 @@ Pic_Bot <- function(Img_Loc, Caption = "", Bot_Name = NULL, Info_Loc = NULL, Tok
     Token <- Bot_Info$Token
     ID <- Bot_Info$ID
 
-    print(Bot_Info)
-
   } else
     if( is.null(Bot_Name) & !is.null(Token) ){
 
@@ -76,7 +74,7 @@ Pic_Bot <- function(Img_Loc, Caption = "", Bot_Name = NULL, Info_Loc = NULL, Tok
 
   } else {
 
-    cat("Pic successfully sent!")
+    if(!Silent) cat("Pic successfully sent!")
 
   }
 

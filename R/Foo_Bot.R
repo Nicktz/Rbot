@@ -18,29 +18,50 @@
 #' @importFrom telegram.bot CommandHandler
 #' @importFrom glue glue
 #' @examples \dontrun{
-#' Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
-#' Function_List <- list()
+#' # Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
+#'Function_List <- list()
+#'
 #'First_Foo <- function(){
-#'x <- 10
-#'y <- 20
-#'message("....Message 1 executed....")
-#'x+y }
-#'Function_List$Foo1 <-
-#'list(Function = First_Foo,
-#'Call = "F1",  # How to call your function from Telegram
-#'Message = "First function executed. This function sources the data fetch.")
-#'Second_Foo <- function(){
-#'x <- 100
-#'y <- 20
-#'message("....Message 2 executed....")
-#' x*y
+#'  x <- 10
+#'  y <- 20
+#'  print(x*y)
+#'  message("....Function 1 executed....")
+#'
 #'}
+#'
+#'Function_List$Foo1 <-
+#'  list(Function = First_Foo,
+#'       # How to call your function from Telegram
+#'       Call = "F1",
+#'       # What to say when executed in Telegram
+#'       Message = "First function executed. This function sources the data fetch.")
+#'
+#'Second_Foo <- function(){
+#'
+#'  x <- 100
+#'  y <- 20
+#'
+#'  message("....Function 2 executed....")
+#'}
+#'
+#'
 #'Function_List$Foo2 <-
-#'list(Function = Second_Foo,
-#'       Call = "F2",  # How to call your function from Telegram
+#'  list(Function = Second_Foo,
+#'       Call = "F2",
 #'       Message = "Report is now being built.")
-#' Bot_Name <- "MyBot"
-#' Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R" )
+#'
+#'
+#'
+#'Error_Foo <- function(){
+#'  log(a)
+#'  message("Example of error.")
+#'
+#'}
+#'
+#'Function_List$FooError <-
+#'  list(Function = Error_Foo,
+#'       Call = "Error_Example",
+#'       Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 #' }
 #' @export
 #'
@@ -49,6 +70,40 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
                      Function_List = NULL,
                      LoadMessage = "\nConnection established with R\n",
                      KillR = TRUE, KillCPU = FALSE) {
+
+
+
+  # Check location, Tokens and bot names...
+  if(is.null(Info_Loc)) {
+    Info_Loc <- path.expand("~")
+  }
+
+  if( !is.null(Bot_Name) & !is.null(Token) ) {stop("\n=========\n...Either provide a Bot_Name (and optional Info_Loc) OR a Token:, not both.\n=========\n")}
+
+  if( is.null(Token) && is.null(Bot_Name)) {stop("\n=========\n...Please provide a valid Bot_Name.\n=========\n")}
+
+
+  if( !is.null(Bot_Name) && is.null(Token)) {
+
+    if(!file.exists(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) stop(glue::glue("\n==============\n\nPlease check whether you added a valid Bot info using Add_Bot.\nI looked in: {Info_Loc}/.Rbots_{Bot_Name}.rds, but did not find a file.\n\nCheck the location ({Info_Loc}), or Bot_Name ({Bot_Name}) provided.\n==============\n") )
+
+    Bot_Info <-
+      readRDS(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))
+    ID <<- Bot_Info$ID
+    Token <- Bot_Info$Token
+
+  } else
+    if( is.null(Bot_Name) & !is.null(Token) ){
+      ID <- NULL
+      bot <<- telegram.bot::Bot(token = Token)
+    }
+
+  # Bot calls and setup
+  bot <<- telegram.bot::Bot(token = Token)
+  updater <<- telegram.bot::Updater(token = Token)
+  dispatcher <- updater$dispatcher
+  updates <- bot$get_updates()
+  if(is.null(ID)) ID <<- unique(updates[[1L]]$from_chat_id())
 
 
   if(is.null(Function_List)) {
@@ -108,7 +163,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     BotMsg <-
-      paste(unlist(MsgLog), collapse = "\n")
+      LoadMessage
     BotMsg <-
       glue::glue("\n {LoadMessage} \n\nYou have not provided bespoke functions to the connection, but you are able to switch the CPU off / force restart R from your phone.\nBy providing a list of functions to Foo_Bot, you can execute functions from your phone.\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
 
@@ -143,38 +198,6 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     # Check functions and their calls :
     if(class(Function_List) != "list") stop("\n\nProvide functions, their calls and their messages in a list. Please see ?Foo_Bot for a full example, or set Function_List to NULL to only have ability to switch CPU off.\n\n")
-
-    # Check location, Tokens and bot names...
-    if(is.null(Info_Loc)) {
-      Info_Loc <- path.expand("~")
-    }
-
-    if( !is.null(Bot_Name) & !is.null(Token) ) {stop("\n=========\n...Either provide a Bot_Name (and optional Info_Loc) OR a Token:, not both.\n=========\n")}
-
-    if( is.null(Token) && is.null(Bot_Name)) {stop("\n=========\n...Please provide a valid Bot_Name.\n=========\n")}
-
-
-    if( !is.null(Bot_Name) && is.null(Token)) {
-
-      if(!file.exists(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) stop(glue::glue("\n==============\n\nPlease check whether you added a valid Bot info using Add_Bot.\nI looked in: {Info_Loc}/.Rbots_{Bot_Name}.rds, but did not find a file.\n\nCheck the location ({Info_Loc}), or Bot_Name ({Bot_Name}) provided.\n==============\n") )
-
-      Bot_Info <-
-        readRDS(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))
-      ID <<- Bot_Info$ID
-      Token <- Bot_Info$Token
-
-    } else
-      if( is.null(Bot_Name) & !is.null(Token) ){
-        ID <- NULL
-        bot <<- telegram.bot::Bot(token = Token)
-      }
-
-    # Bot calls and setup
-    bot <<- telegram.bot::Bot(token = Token)
-    updater <<- telegram.bot::Updater(token = Token)
-    dispatcher <- updater$dispatcher
-    updates <- bot$get_updates()
-    if(is.null(ID)) ID <<- unique(updates[[1L]]$from_chat_id())
 
     # Function map creator.
     # Add handles...

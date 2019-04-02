@@ -5,7 +5,7 @@
 \title{Foo_Bot}
 \usage{
 Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
-  Function_List, LoadMessage = "\\nConnection established with R\\n",
+  Function_List = NULL, LoadMessage = "\\nConnection established with R\\n",
   KillR = TRUE, KillCPU = FALSE)
 }
 \arguments{
@@ -34,28 +34,49 @@ on your demand.
 }
 \examples{
 \dontrun{
-Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
+# Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
 Function_List <- list()
+
 First_Foo <- function(){
-x <- 10
-y <- 20
-message("....Message 1 executed....")
-x+y }
-Function_List$Foo1 <-
-list(Function = First_Foo,
-Call = "F1",  # How to call your function from Telegram
-Message = "First function executed. This function sources the data fetch.")
-Second_Foo <- function(){
-x <- 100
-y <- 20
-message("....Message 2 executed....")
-x*y
+ x <- 10
+ y <- 20
+ print(x*y)
+ message("....Function 1 executed....")
+
 }
+
+Function_List$Foo1 <-
+ list(Function = First_Foo,
+      # How to call your function from Telegram
+      Call = "F1",
+      # What to say when executed in Telegram
+      Message = "First function executed. This function sources the data fetch.")
+
+Second_Foo <- function(){
+
+ x <- 100
+ y <- 20
+
+ message("....Function 2 executed....")
+}
+
+
 Function_List$Foo2 <-
-list(Function = Second_Foo,
-      Call = "F2",  # How to call your function from Telegram
+ list(Function = Second_Foo,
+      Call = "F2",
       Message = "Report is now being built.")
-Bot_Name <- "MyBot"
-Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R" )
+
+
+
+Error_Foo <- function(){
+ log(a)
+ message("Example of error.")
+
+}
+
+Function_List$FooError <-
+ list(Function = Error_Foo,
+      Call = "Error_Example",
+      Message = "\\nError function illustrated: \\nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 }
 }

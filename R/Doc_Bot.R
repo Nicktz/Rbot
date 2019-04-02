@@ -70,7 +70,7 @@ Doc_Bot <- function(Doc_Location, Bot_Name = NULL, Info_Loc = NULL, Token = NULL
 
   } else {
 
-    cat("Document successfully sent!")
+   if(!Silent) cat("Document successfully sent!")
 
   }
 

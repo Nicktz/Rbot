@@ -35,13 +35,13 @@ if(missing(Token)) {
 
 }
 
-  if(is.null(Info_Loc)){
+if(is.null(Info_Loc)){
 
-    Info_Loc <- path.expand("~")
+  Info_Loc <- path.expand("~")
 
-  }
+}
 
-  if(!is.null(Bot_Name)){
+if(!is.null(Bot_Name)){
 
   if(file.exists(file.path(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) ){
 
@@ -49,52 +49,64 @@ if(missing(Token)) {
 
   }
 
-  }
+}
 
 
-  bot <- telegram.bot::Bot(token = Token)
-  WhoIt <- bot$get_me()
+bot <- telegram.bot::Bot(token = Token)
 
-  if(!WhoIt$is_bot) {
+Check_Breaking_Changes <-
+  tryCatch(
+    expr = {
+      bot$get_me()
+    },
+    error = function(e){
+      stop('Please use the latest version of telegram.bot and telegram - several breaking changes have been introduced. Use install.packages and try again.')
+    },
+    finally = ""
+  )
 
-    stop(glue::glue("========================================\n\nYou provided an invalid token:\n\n{Token}\n\nTo check whether your token is correct, enter in a web browser: https://api.telegram.org/bot<YOURTOKEN>/getMe \n For your submitted token, it is: https://api.telegram.org/bot{Token}/getMe \n If you see: error_code:401, you've entered a wrong Token.\n\nThen try again... (or see this link: https://github.com/ebeneditos/telegram.bot/wiki/Tutorial-%E2%80%93-Building-an-R-Bot-in-3-steps for more help.)\n\n========================================"))
+WhoIt <- bot$get_me()
+
+if(!WhoIt$is_bot) {
+
+  stop(glue::glue("========================================\n\nYou provided an invalid token:\n\n{Token}\n\nTo check whether your token is correct, enter in a web browser: https://api.telegram.org/bot<YOURTOKEN>/getMe \n For your submitted token, it is: https://api.telegram.org/bot{Token}/getMe \n If you see: error_code:401, you've entered a wrong Token.\n\nThen try again... (or see this link: https://github.com/ebeneditos/telegram.bot/wiki/Tutorial-%E2%80%93-Building-an-R-Bot-in-3-steps for more help.)\n\n========================================"))
+
+} else {
+
+  # if(is.null(Bot_Name)) {
+
+  glue::glue("\n\nNote that the botname that corresponds to the given Token is: officially named: {WhoIt$first_name} on your phone, with username: {WhoIt$username}).\n")
+
+  if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone on the Telegram app (you might need to do this again), and then run function again...\n")
+
+  updates <- bot$getUpdates()
+  ID <- unique(updates[[1L]]$from_chat_id())
+
+  if(!is.null(Bot_Name)) {
+
+    BotName_ToUse <- Bot_Name
 
   } else {
 
-      # if(is.null(Bot_Name)) {
+    BotName_ToUse  <- WhoIt$first_name
 
-        glue::glue("\n\nNote that the botname that corresponds to the given Token is: officially named: {WhoIt$first_name} on your phone, with username: {WhoIt$username}).\n")
+  }
 
-      if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone on the Telegram app (you might need to do this again), and then run function again...\n")
+  SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{BotName_ToUse}.rds")
 
-      updates <- bot$getUpdates()
-      ID <- unique(updates[[1L]]$from_chat_id())
-
-      if(!is.null(Bot_Name)) {
-
-        BotName_ToUse <- Bot_Name
-
-      } else {
-
-        BotName_ToUse  <- WhoIt$first_name
-
-      }
-
-      SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{BotName_ToUse}.rds")
-
-      SaveEntry <- list()
-      SaveEntry$Description <- glue::glue("This is the bot identifyer for bot call:
+  SaveEntry <- list()
+  SaveEntry$Description <- glue::glue("This is the bot identifyer for bot call:
 
                                           {BotName_ToUse}.
 
                                           You can simply reference this bot's name and location (if location is other than default) when using other functions")
-      SaveEntry$BotName <- BotName_ToUse
-      SaveEntry$ID <- ID
-      SaveEntry$Token <- Token
+  SaveEntry$BotName <- BotName_ToUse
+  SaveEntry$ID <- ID
+  SaveEntry$Token <- Token
 
-      saveRDS(object = SaveEntry, SaveLoc)
+  saveRDS(object = SaveEntry, SaveLoc)
 
-      Msg <- glue::glue("==========================
+  Msg <- glue::glue("==========================
                         Hello from R!
 
                         Your bot is locked and loaded!
@@ -113,12 +125,12 @@ if(missing(Token)) {
                         Enjoy using Telegram!
                         ==========================")
 
-      # Send cellphone confirmation. SUppress the charToRaw(enc2utf8(val)) message.
-      suppressWarnings(bot$sendMessage(chat_id = ID, text = Msg))
+  # Send cellphone confirmation. SUppress the charToRaw(enc2utf8(val)) message.
+  suppressWarnings(bot$sendMessage(chat_id = ID, text = Msg))
 
-      if(!Silent){
+  if(!Silent){
 
-        message(cat(glue::glue("===========================\n\n
+    message(cat(glue::glue("===========================\n\n
                      Congratulations! You have successfully created an info file for your bot!
 
                      Location: {SaveLoc}
@@ -133,13 +145,13 @@ if(missing(Token)) {
                      Text_Bot(Msg = 'hello from R!', Bot_Name = '{SaveEntry$BotName}', Info_Loc '{Info_Loc}')
 
                      \n\n===========================")))
-      }
-
-
   }
 
 
+}
 
-  }
+
+
+}
 
 
