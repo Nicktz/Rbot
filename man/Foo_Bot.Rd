@@ -4,9 +4,9 @@
 \alias{Foo_Bot}
 \title{Foo_Bot}
 \usage{
-Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL, Function_List,
-  LoadMessage = "\\nConnection established with R\\n", KillR = TRUE,
-  KillCPU = FALSE)
+Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
+  Function_List, LoadMessage = "\\nConnection established with R\\n",
+  KillR = TRUE, KillCPU = FALSE)
 }
 \arguments{
 \item{Bot_Name}{Name of the bot to do the sending.}
@@ -34,36 +34,28 @@ on your demand.
 }
 \examples{
 \dontrun{
-# Create function list to fill with your commands.
-# Each function needs a Function, Call and Message. You will be alerted if one is missing.
+Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
 Function_List <- list()
 First_Foo <- function(){
 x <- 10
 y <- 20
-print(x*y)
 message("....Message 1 executed....")
-
-}
-
+x+y }
 Function_List$Foo1 <-
 list(Function = First_Foo,
 Call = "F1",  # How to call your function from Telegram
 Message = "First function executed. This function sources the data fetch.")
-
 Second_Foo <- function(){
-
 x <- 100
 y <- 20
-print(x* y / 1000)
 message("....Message 2 executed....")
+x*y
 }
-
 Function_List$Foo2 <-
 list(Function = Second_Foo,
-       Call = "F2",  # How to call your function from Telegram
-       Message = "Report is now being built.")
-
- Bot_Name <- "MyBot"
- Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R" )
- }
+      Call = "F2",  # How to call your function from Telegram
+      Message = "Report is now being built.")
+Bot_Name <- "MyBot"
+Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R" )
+}
 }

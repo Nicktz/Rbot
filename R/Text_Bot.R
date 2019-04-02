@@ -9,6 +9,7 @@
 #' @return Bot message sent
 #' @importFrom telegram.bot Bot
 #' @importFrom glue glue
+#' @importFrom purrr safely
 #' @param Msg Message to send to your phone from R.
 #' @param Bot_Name Name of the bot to do the sending.
 #' @param Info_Loc Where the RDS file with your needed bot info is saved. Defaults to path.expand("~")
@@ -46,33 +47,30 @@ Text_Bot <- function(Msg, Bot_Name = NULL, Info_Loc = NULL, Token = NULL, Silent
     ID <- Bot_Info$ID
 
   } else
+
     if( is.null(Bot_Name) & !is.null(Token) ){
 
       bot <- telegram.bot::Bot(token = Token)
+      updates <- bot$get_updates()
       if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone (Telegram app), and then run function again...\nConsider using Add_Bot to one time save your Token and ID for a given bot...\n")
-      ID <- unique(bot$getUpdates()$message$from$id)
+      ID <- unique(updates[[1L]]$from_chat_id())
 
     }
 
   bot <- telegram.bot::Bot(token = Token)
-  Sent <- bot$sendMessage(chat_id = ID, text = Msg)
+  safesend <- purrr::safely(bot$sendMessage)
+  Sent <- safesend(chat_id = ID, text = Msg)
 
   # Sent[[2]] == 401: wrong bot. Token issue.
   # Sent[[2]] == 400: Right bot. ID issue.
+if(!is.null(Sent$error)){
 
-  if( Sent[[2]] == 400 | Sent[[2]] == 401) {
+  stop(glue::glue("\n==============\nMessage sending failed.\nLikely cause:\n\n...You provided a wrong ID.\n...Or if no ID was provided, you may have not yet initiated a chat with your bot (simply send a 'Hi' message)\n\nPlease check and retry.\n\nConversely, check your Bot_Name and perhaps rerun Add_Bot function.\n=======================\n"))
 
-    warning(glue::glue("\n==============\nMessage sending failed.\nLikely cause:\n\n...You provided a wrong ID.\n...Or if no ID was provided, you may have not yet initiated a chat with your bot (simply send a 'Hi' message)\n\nPlease check and retry.\n\nConversely, check your Bot_Name and perhaps rerun Add_Bot function.\n=======================\n"))
+} else {
 
-  } else {
-
-    if(!Silent){
-
-      cat("Message successfully sent!")
+  if(!Silent) cat("\nMessage successfully sent\n")
 
     }
-
-  }
-
 
 }

@@ -4,12 +4,12 @@
 \alias{Add_Bot}
 \title{Add_Bot}
 \usage{
-Add_Bot(Token, File_Name_Used = NULL, Info_Loc = NULL, Silent = FALSE)
+Add_Bot(Token, Bot_Name = NULL, Info_Loc = NULL, Silent = FALSE)
 }
 \arguments{
 \item{Token}{Add the Token provided by the Botfather from the Telegram app on your website.}
 
-\item{File_Name_Used}{Default is to use the bot's name. Name of the RDS file with your bots' information saved in.}
+\item{Bot_Name}{Default is to use the bot's name given to the botfather. This will also be the name of the RDS file with your bots' information saved in.}
 
 \item{Info_Loc}{Where the RDS file with your needed bot info is saved. Defaults to path.expand("~")}
 

@@ -14,8 +14,9 @@
 #' @return RDS file saved with the needed bot information. The printed message after running the function will give the location of the file.
 #' @importFrom telegram.bot Bot
 #' @importFrom glue glue
+#' @importFrom purrr safely
 #' @param Token Add the Token provided by the Botfather from the Telegram app on your website.
-#' @param File_Name_Used Default is to use the bot's name. Name of the RDS file with your bots' information saved in.
+#' @param Bot_Name Default is to use the bot's name given to the botfather. This will also be the name of the RDS file with your bots' information saved in.
 #' @param Info_Loc Where the RDS file with your needed bot info is saved. Defaults to path.expand("~")
 #' @param Silent Choose to not print successful execution. Defaults to TRUE.
 #' @examples \dontrun{
@@ -26,7 +27,7 @@
 #'
 #'
 
-Add_Bot <- function(Token, File_Name_Used = NULL, Info_Loc = NULL, Silent = FALSE) {
+Add_Bot <- function(Token, Bot_Name = NULL, Info_Loc = NULL, Silent = FALSE) {
 
 if(missing(Token)) {
 
@@ -40,11 +41,11 @@ if(missing(Token)) {
 
   }
 
-  if(!is.null(File_Name_Used)){
+  if(!is.null(Bot_Name)){
 
-  if(file.exists(file.path(glue::glue("{Info_Loc}/.Rbots_{File_Name_Used}.rds"))) ){
+  if(file.exists(file.path(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) ){
 
-    Continue <- readline(prompt = cat(glue::glue("\n\nFile {Info_Loc}/.Rbots_{File_Name_Used}.rds already exists.\n Are you sure you want to continue overriding the old file?\nPress Enter to continue, or Escape to escape.\n")))
+    Continue <- readline(prompt = cat(glue::glue("\n\nFile {Info_Loc}/.Rbots_{Bot_Name}.rds already exists.\n Are you sure you want to continue overriding the old file?\nPress Enter to continue, or Escape to escape.\n")))
 
   }
 
@@ -52,23 +53,34 @@ if(missing(Token)) {
 
 
   bot <- telegram.bot::Bot(token = Token)
-  WhoIt <- bot$getMe()
+  WhoIt <- bot$get_me()
 
-  if(WhoIt[[2]] == 401) {
+  if(!WhoIt$is_bot) {
 
-    stop(glue::glue("========================================\n\nYou provided an invalid token:\n\n{R_TELEGRAM_BOT_RBot}\n\nTo check whether your token is correct, enter in a web browser: https://api.telegram.org/bot<YOURTOKEN>/getMe \n If you see: error_code:401, you've entered a wrong Token.\n\nThen try again... (or see this link: https://github.com/ebeneditos/telegram.bot/wiki/Tutorial-%E2%80%93-Building-an-R-Bot-in-3-steps for more help.)\n\n========================================"))
+    stop(glue::glue("========================================\n\nYou provided an invalid token:\n\n{Token}\n\nTo check whether your token is correct, enter in a web browser: https://api.telegram.org/bot<YOURTOKEN>/getMe \n For your submitted token, it is: https://api.telegram.org/bot{Token}/getMe \n If you see: error_code:401, you've entered a wrong Token.\n\nThen try again... (or see this link: https://github.com/ebeneditos/telegram.bot/wiki/Tutorial-%E2%80%93-Building-an-R-Bot-in-3-steps for more help.)\n\n========================================"))
 
   } else {
 
-      BotName_ToUse <- readline(prompt = cat(glue::glue("\n\nPlease enter the Bot name that just appeared on your screen followed by Enter.\n")))
+      # if(is.null(Bot_Name)) {
+
+        glue::glue("\n\nNote that the botname that corresponds to the given Token is: officially named: {WhoIt$first_name} on your phone, with username: {WhoIt$username}).\n")
 
       if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone on the Telegram app (you might need to do this again), and then run function again...\n")
 
-      ID <- unique(bot$getUpdates()$message$from$id)
+      updates <- bot$getUpdates()
+      ID <- unique(updates[[1L]]$from_chat_id())
 
-      if(is.null(File_Name_Used)) File_Name_Used <- BotName_ToUse
+      if(!is.null(Bot_Name)) {
 
-      SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{File_Name_Used}.rds")
+        BotName_ToUse <- Bot_Name
+
+      } else {
+
+        BotName_ToUse  <- WhoIt$first_name
+
+      }
+
+      SaveLoc <- glue::glue("{Info_Loc}/.Rbots_{BotName_ToUse}.rds")
 
       SaveEntry <- list()
       SaveEntry$Description <- glue::glue("This is the bot identifyer for bot call:
@@ -92,11 +104,7 @@ if(missing(Token)) {
 
                         To call your bot in other functions, use the Bot name:
 
-                          {SaveEntry$BotName}
-
-                        and the location (if not kept to default):
-
-                        {path.expand('~')}
+                        {SaveEntry$BotName}
 
                         Type in R the following to see if it works:
 
@@ -128,6 +136,10 @@ if(missing(Token)) {
       }
 
 
-  }}
+  }
+
+
+
+  }
 
 

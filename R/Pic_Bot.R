@@ -9,6 +9,7 @@
 #' @return Bot Document sent
 #' @importFrom telegram.bot Bot
 #' @importFrom glue glue
+#' @importFrom purrr safely
 #' @param Img_Loc Image to send to your phone from R (e.g. a png file).
 #' @param Caption Caption to your image. Defaults to none.
 #' @param Bot_Name Name of the bot to do the sending.
@@ -51,34 +52,34 @@ Pic_Bot <- function(Img_Loc, Caption = "", Bot_Name = NULL, Info_Loc = NULL, Tok
     Token <- Bot_Info$Token
     ID <- Bot_Info$ID
 
+    print(Bot_Info)
+
   } else
     if( is.null(Bot_Name) & !is.null(Token) ){
 
       bot <- telegram.bot::Bot(token = Token)
+      updates <- bot$get_updates()
       if(length(bot$getUpdates()) == 0) stop("\nPlease first send a message to your intended bot from your phone (Telegram app), and then run function again...\nConsider using Add_Bot to one time save your Token and ID for a given bot...\n")
-      ID <- unique(bot$getUpdates()$message$from$id)
+      ID <- unique(updates[[1L]]$from_chat_id())
 
     }
 
   bot <- telegram.bot::Bot(token = Token)
+  safesend <- purrr::safely(bot$sendPhoto)
   Sent <- bot$sendPhoto(chat_id = ID, photo = Img_Loc, caption = Caption)
 
   # Sent[[2]] == 401: wrong bot. Token issue.
   # Sent[[2]] == 400: Right bot. ID issue.
 
-  if( Sent[[2]] == 400 | Sent[[2]] == 401) {
-
-    warning(glue::glue("\n==============\nImage sending failed.\nLikely cause:\n\n...You provided a wrong ID.\n...Or if no ID was provided, you may have not yet initiated a chat with your bot (simply send a 'Hi' message)\n\nPlease check and retry.\n\nConversely, check your Bot_Name and perhaps rerun Add_Bot function.\n=======================\n"))
+  if(!is.null(Sent$error)){
+    stop(glue::glue("\n==============\nPicture sending failed.\nLikely cause:\n\n...You provided a wrong ID.\n...Or if no ID was provided, you may have not yet initiated a chat with your bot (simply send a 'Hi' message)\n\nPlease check and retry.\n\nConversely, check your Bot_Name and perhaps rerun Add_Bot function.\n=======================\n"))
 
   } else {
 
-    if(!Silent){
-
-      cat("Image successfully sent!")
-
-    }
+    cat("Pic successfully sent!")
 
   }
+
 
 
 }

@@ -10,7 +10,8 @@ Description: Send messages from R to your phone, as well as execute functions in
     for executing functions in scripts.
 Maintainer: Nico Katzke <nfkatzke@gmail.com>
 BugReports: https://github.com/nicktz/Rbot/issues
-URL: https://curiousquant.com/Rbot
+URL: https://rbot.nfkatzke.com/
+Encoding: UTF-8
 Depends:
     R (>= 3.4.0)
 Imports:
@@ -20,7 +21,7 @@ Imports:
     glue
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Repository: CRAN
 NeedsCompilation: yes
 ByteCompile: yes
