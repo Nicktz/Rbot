@@ -253,7 +253,7 @@ functions on your computer from your phone. If the function list is set
 to NULL (default), it simply allows the user to force switch off a
 computer or server at any time from your phone.
 
-Currently, the function allows you to have 10 functions, with your own
+Currently, the function allows you to have 20 functions, with your own
 calls, open for execution from your phone.
 
 The functions will be **safely** executed, implying if there is an

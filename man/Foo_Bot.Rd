@@ -15,7 +15,7 @@ Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 \item{Token}{Token of your bot if not using the saved file call from Rbot::Add_Bot()}
 
-\item{Function_List}{Function_List containing for each function: The function to be called, the call handle, as well as the message sent to Telegram.}
+\item{Function_List}{Function_List containing for each function: The function to be called, the call handle, as well as the message sent to Telegram. Up to 20 functions can be added.}
 
 \item{LoadMessage}{What to display on your phone when this call is initialised}
 

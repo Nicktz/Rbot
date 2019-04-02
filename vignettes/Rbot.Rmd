@@ -228,7 +228,7 @@ This function offers a simple workflow for developers to open a connection betwe
 
 The main idea behind this function is to allow you to execute a set of functions on your computer from your phone. If the function list is set to NULL (default), it simply allows the user to force switch off a computer or server at any time from your phone.
 
-Currently, the function allows you to have 10 functions, with your own calls, open for execution from your phone. 
+Currently, the function allows you to have 20 functions, with your own calls, open for execution from your phone. 
 
 The functions will be __safely__ executed, implying if there is an error, it will not interrupt your connection to the phone. Rather, it will show the error message on your phone, and allow you to keep the connection open. The ability to switch you computer off completely from your phone is particularly useful when running computers unattended (e.g. from public terminals).
 

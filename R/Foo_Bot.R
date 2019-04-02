@@ -8,7 +8,7 @@
 #' @param Bot_Name Name of the bot to do the sending.
 #' @param Info_Loc Where the RDS file with your needed bot info is saved. Defaults to path.expand("~")
 #' @param Token Token of your bot if not using the saved file call from Rbot::Add_Bot()
-#' @param Function_List Function_List containing for each function: The function to be called, the call handle, as well as the message sent to Telegram.
+#' @param Function_List Function_List containing for each function: The function to be called, the call handle, as well as the message sent to Telegram. Up to 20 functions can be added.
 #' @param LoadMessage What to display on your phone when this call is initialised
 #' @param KillR Add option to kill R from your phone. Default to TRUE
 #' @param KillCPU Add option to turn off your computer completely, no questions asked. Default to FALSE. Useful if working e.g. on a public CPU that you want to log out from remotely.
@@ -466,7 +466,257 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     }
 
-    if(FuncN > 10){
+
+    if(exists("Foo11")){
+      Handle_Func11 <- function( bot, update){
+        Result <- Foo11()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call11}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call11}"))
+
+        }
+      }
+      # Handle_Pass11 <- telegram.bot::CommandHandler(Call, Handle_Func11, pass_args = TRUE)
+      Handle_Pass11 <- telegram.bot::CommandHandler(command = Call11, Handle_Func11)
+      dispatcher$add_handler(Handle_Pass11)
+
+    }
+
+
+    if(exists("Foo12")){
+      Handle_Func12 <- function( bot, update){
+        Result <- Foo12()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call12}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call12}"))
+
+        }
+      }
+      # Handle_Pass12 <- telegram.bot::CommandHandler(Call, Handle_Func12, pass_args = TRUE)
+      Handle_Pass12 <- telegram.bot::CommandHandler(command = Call12, Handle_Func12)
+      dispatcher$add_handler(Handle_Pass12)
+
+    }
+
+
+    if(exists("Foo13")){
+      Handle_Func13 <- function( bot, update){
+        Result <- Foo13()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call13}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call13}"))
+
+        }
+      }
+      # Handle_Pass13 <- telegram.bot::CommandHandler(Call, Handle_Func13, pass_args = TRUE)
+      Handle_Pass13 <- telegram.bot::CommandHandler(command = Call13, Handle_Func13)
+      dispatcher$add_handler(Handle_Pass13)
+
+    }
+
+
+    if(exists("Foo14")){
+      Handle_Func14 <- function( bot, update){
+        Result <- Foo14()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call14}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call14}"))
+
+        }
+      }
+      # Handle_Pass14 <- telegram.bot::CommandHandler(Call, Handle_Func14, pass_args = TRUE)
+      Handle_Pass14 <- telegram.bot::CommandHandler(command = Call14, Handle_Func14)
+      dispatcher$add_handler(Handle_Pass14)
+
+    }
+
+
+    if(exists("Foo15")){
+      Handle_Func15 <- function( bot, update){
+        Result <- Foo15()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call15}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call15}"))
+
+        }
+      }
+      # Handle_Pass15 <- telegram.bot::CommandHandler(Call, Handle_Func15, pass_args = TRUE)
+      Handle_Pass15 <- telegram.bot::CommandHandler(command = Call15, Handle_Func15)
+      dispatcher$add_handler(Handle_Pass15)
+
+    }
+
+
+    if(exists("Foo16")){
+      Handle_Func16 <- function( bot, update){
+        Result <- Foo16()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call16}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call16}"))
+
+        }
+      }
+      # Handle_Pass16 <- telegram.bot::CommandHandler(Call, Handle_Func16, pass_args = TRUE)
+      Handle_Pass16 <- telegram.bot::CommandHandler(command = Call16, Handle_Func16)
+      dispatcher$add_handler(Handle_Pass16)
+
+    }
+
+
+    if(exists("Foo17")){
+      Handle_Func17 <- function( bot, update){
+        Result <- Foo17()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call17}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call17}"))
+
+        }
+      }
+      # Handle_Pass17 <- telegram.bot::CommandHandler(Call, Handle_Func17, pass_args = TRUE)
+      Handle_Pass17 <- telegram.bot::CommandHandler(command = Call17, Handle_Func17)
+      dispatcher$add_handler(Handle_Pass17)
+
+    }
+
+
+    if(exists("Foo18")){
+      Handle_Func18 <- function( bot, update){
+        Result <- Foo18()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call18}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call18}"))
+
+        }
+      }
+      # Handle_Pass18 <- telegram.bot::CommandHandler(Call, Handle_Func18, pass_args = TRUE)
+      Handle_Pass18 <- telegram.bot::CommandHandler(command = Call18, Handle_Func18)
+      dispatcher$add_handler(Handle_Pass18)
+
+    }
+
+
+    if(exists("Foo19")){
+      Handle_Func19 <- function( bot, update){
+        Result <- Foo19()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call19}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call19}"))
+
+        }
+      }
+      # Handle_Pass19 <- telegram.bot::CommandHandler(Call, Handle_Func19, pass_args = TRUE)
+      Handle_Pass19 <- telegram.bot::CommandHandler(command = Call19, Handle_Func19)
+      dispatcher$add_handler(Handle_Pass19)
+
+    }
+
+
+    if(exists("Foo20")){
+      Handle_Func20 <- function( bot, update){
+        Result <- Foo20()
+
+        if(!is.null(Result$error)) {
+
+          # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("***ERROR Produced***: \n Function: {Call20}\n\n * Error details:\n {Result$error}"))
+          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
+        } else {
+
+          # # bot$get_updates(offset = update$update_id + 1)
+          bot$sendMessage(chat_id = ID,
+                          text = glue::glue("Executed: {Call20}"))
+
+        }
+      }
+      # Handle_Pass20 <- telegram.bot::CommandHandler(Call, Handle_Func20, pass_args = TRUE)
+      Handle_Pass20 <- telegram.bot::CommandHandler(command = Call20, Handle_Func20)
+      dispatcher$add_handler(Handle_Pass20)
+
+    }
+
+    if(FuncN > 20){
       stop("Foo_Bot currently supports 10 functions. You can change the source code if you wish to add more...")
     }
 
