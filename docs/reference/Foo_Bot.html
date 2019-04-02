@@ -112,9 +112,9 @@ on your demand.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>Foo_Bot</span>(<span class='kw'>Bot_Name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>Info_Loc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>Token</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>Function_List</span>,
-  <span class='kw'>LoadMessage</span> <span class='kw'>=</span> <span class='st'>"\nConnection established with R\n"</span>, <span class='kw'>KillR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>KillCPU</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>Foo_Bot</span>(<span class='kw'>Bot_Name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>Info_Loc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>Token</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>Function_List</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>LoadMessage</span> <span class='kw'>=</span> <span class='st'>"\nConnection established with R\n"</span>,
+  <span class='kw'>KillR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>KillCPU</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,38 +156,50 @@ on your demand.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='co'># Create function list to fill with your commands.</span>
-<span class='co'># Each function needs a Function, Call and Message. You will be alerted if one is missing.</span>
+<span class='co'># Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.</span>
 <span class='no'>Function_List</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>()
+
 <span class='no'>First_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(){
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fl'>20</span>
-<span class='fu'>print</span>(<span class='no'>x</span>*<span class='no'>y</span>)
-<span class='fu'>message</span>(<span class='st'>"....Message 1 executed...."</span>)
+ <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>10</span>
+ <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fl'>20</span>
+ <span class='fu'>print</span>(<span class='no'>x</span>*<span class='no'>y</span>)
+ <span class='fu'>message</span>(<span class='st'>"....Function 1 executed...."</span>)
 
 }
 
 <span class='no'>Function_List</span>$<span class='no'>Foo1</span> <span class='kw'>&lt;-</span>
-<span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>First_Foo</span>,
-<span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F1"</span>,  <span class='co'># How to call your function from Telegram</span>
-<span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"First function executed. This function sources the data fetch."</span>)
+ <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>First_Foo</span>,
+      <span class='co'># How to call your function from Telegram</span>
+      <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F1"</span>,
+      <span class='co'># What to say when executed in Telegram</span>
+      <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"First function executed. This function sources the data fetch."</span>)
 
 <span class='no'>Second_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(){
 
-<span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fl'>20</span>
-<span class='fu'>print</span>(<span class='no'>x</span>* <span class='no'>y</span> / <span class='fl'>1000</span>)
-<span class='fu'>message</span>(<span class='st'>"....Message 2 executed...."</span>)
+ <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
+ <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fl'>20</span>
+
+ <span class='fu'>message</span>(<span class='st'>"....Function 2 executed...."</span>)
 }
 
+
 <span class='no'>Function_List</span>$<span class='no'>Foo2</span> <span class='kw'>&lt;-</span>
-<span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Second_Foo</span>,
-       <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F2"</span>,  <span class='co'># How to call your function from Telegram</span>
-       <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Report is now being built."</span>)
+ <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Second_Foo</span>,
+      <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F2"</span>,
+      <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Report is now being built."</span>)
 
- <span class='no'>Bot_Name</span> <span class='kw'>&lt;-</span> <span class='st'>"MyBot"</span>
- <span class='fu'>Foo_Bot</span>(<span class='kw'>Bot_Name</span> <span class='kw'>=</span> <span class='no'>Bot_Name</span>, <span class='kw'>Function_List</span> <span class='kw'>=</span> <span class='no'>Function_List</span>, <span class='kw'>LoadMessage</span> <span class='kw'>=</span> <span class='st'>"My connection with R"</span> )
 
+
+<span class='no'>Error_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(){
+ <span class='fu'>log</span>(<span class='no'>a</span>)
+ <span class='fu'>message</span>(<span class='st'>"Example of error."</span>)
+
+}
+
+<span class='no'>Function_List</span>$<span class='no'>FooError</span> <span class='kw'>&lt;-</span>
+ <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Error_Foo</span>,
+      <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"Error_Example"</span>,
+      <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely"</span>)
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
