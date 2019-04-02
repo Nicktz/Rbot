@@ -62,6 +62,10 @@
 #'  list(Function = Error_Foo,
 #'       Call = "Error_Example",
 #'       Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
+#'
+#'  Bot_Name <- "Gobot"
+#'  Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
+#'        KillR = TRUE, KillCPU = FALSE)
 #' }
 #' @export
 #'

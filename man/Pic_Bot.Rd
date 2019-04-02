@@ -39,10 +39,6 @@ plot(rnorm(100))
 dev.off()
 Img_Loc = 'test.png'
 Bot_Name <- "Soldier1"
-Pic_Bot(Img_Loc = Img_Loc, Bot_Name = Bot_Name) # assume default logcation
-# If you used a specific Add_Bot location:
-Text_Bot(Msg = Msg, Bot_Name = Bot_Name, Info_Loc = Some_Path)
-# If you prefer setting the Token and ID directly here:
-Text_Bot(Msg = Msg, Token = TOKEN, ID = Chat_ID)
+Pic_Bot(Img_Loc = Img_Loc, Bot_Name = Bot_Name) # assume default location
 }
 }

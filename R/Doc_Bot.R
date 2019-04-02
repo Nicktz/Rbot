@@ -18,11 +18,7 @@
 #' @examples \dontrun{
 #' Doc_Location <- YOUR_PDF_LOCATION # e.g. Doc_Location <- "somefile.pdf"
 #' Bot_Name <- "Soldier1"
-#' Doc_Bot(Doc_Location = Doc_Location, Bot_Name = Bot_Name) # assume default logcation
-#' # If you used a specific Add_Bot location:
-#' Text_Bot(Msg = Msg, Bot_Name = Bot_Name, Info_Loc = Some_Path)
-#' # If you prefer setting the Token and ID directly here:
-#' Text_Bot(Msg = Msg, Token = TOKEN, ID = Chat_ID)
+#' Doc_Bot(Doc_Location = Doc_Location, Bot_Name = Bot_Name) # assume default location
 #' }
 #' @export
 #'

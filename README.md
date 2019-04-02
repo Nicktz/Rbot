@@ -25,10 +25,10 @@ facilitates the use of the telegram and telegram.bot apps in R.
     Congratulations…” message from botfather. Press start below and send
     your bot a message (“Hi Bot!”)
 
--   Take note of the Token given by @botfather. It is a looong Token
-    that you can easily misspell. **TIP**: mail this to yourself from
-    your phone and copy Token into R (you will likely type something
-    wrong…).
+-   Take note of the Token given by @botfather. It is a very long string
+    that you can easily misspell. **TIP**: open up [Telegram’s web
+    URL](https://web.telegram.org/) (or mail the token to yourself) and
+    copy it from your computer.
 
 1.  In R, run the following code to save your bot’s credentials on your
     computer (assuming default locations apply):

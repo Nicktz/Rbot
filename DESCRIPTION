@@ -1,6 +1,6 @@
 Package: Rbot
-Version: 1.0.1
-Date: 2018-08-07
+Version: 1.0.2
+Date: 2019-04-02
 Type: Package
 Title: Send Messages and Execute Functions in R from your Cellphone using the Telegram App
 Authors@R: person("Nico", "Katzke", role = c("aut", "cre"), email = "nfkatzke@gmail.com")

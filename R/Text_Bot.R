@@ -18,7 +18,7 @@
 #' @examples \dontrun{
 #' Msg <- "Starting to run routine now...."
 #' Bot_Name <- "Soldier1"
-#' Text_Bot(Msg = Msg, Bot_Name = Bot_Name)  # assume default logcation
+#' Text_Bot(Msg = Msg, Bot_Name = Bot_Name)  # assume default location
 #' # If you used another Add_Bot location:
 #' Text_Bot(Msg = Msg, Bot_Name = Bot_Name, Info_Loc = SOME_PATH)
 #' # If you prefer setting the Token and ID directly here:
