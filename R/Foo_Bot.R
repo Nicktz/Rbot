@@ -76,7 +76,6 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
                      KillR = TRUE, KillCPU = FALSE) {
 
 
-
   # Check location, Tokens and bot names...
   if(is.null(Info_Loc)) {
     Info_Loc <- path.expand("~")
@@ -91,7 +90,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     if(!file.exists(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))) stop(glue::glue("\n==============\n\nPlease check whether you added a valid Bot info using Add_Bot.\nI looked in: {Info_Loc}/.Rbots_{Bot_Name}.rds, but did not find a file.\n\nCheck the location ({Info_Loc}), or Bot_Name ({Bot_Name}) provided.\n==============\n") )
 
-    Bot_Info <-
+    Bot_Info <<-
       readRDS(glue::glue("{Info_Loc}/.Rbots_{Bot_Name}.rds"))
     ID <<- Bot_Info$ID
     Token <- Bot_Info$Token
@@ -106,18 +105,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
   bot <<- telegram.bot::Bot(token = Token)
   updater <<- telegram.bot::Updater(token = Token)
   dispatcher <- updater$dispatcher
-  updates <- bot$get_updates()
-  if(is.null(ID)) ID <<- unique(updates[[1L]]$from_chat_id())
+  updates <<- bot$get_updates()
+  bot$get_updates(offset = updates$update_id + 1)
 
+  if(is.null(ID)) ID <<- unique(updates[[1L]]$from_chat_id())
 
   if(is.null(Function_List)) {
 
     # Kill Command
-    kill <- function(bot, update){
+    kill <- function(bot, updates){
 
-      bot$sendMessage(chat_id = ID,
+      bot$sendMessage(chat_id =ID,
                       text = "\nBot Connection Closed Successfully\n")
-      bot$get_updates(offset = update$update_id + 1)
+      bot$get_updates(offset = updates$update_id + 1)
       # Stop the updater polling
       updater$stop_polling()
 
@@ -132,9 +132,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     #
     if(KillR) {
 
-      killR <- function(bot, update){
+      killR <- function(bot, updates){
 
-        bot$sendMessage(chat_id = ID,
+        bot$sendMessage(chat_id =ID,
                         text = "Your R session will now restart itself...Connection will be lost.\n Goodbye!")
         Sys.sleep(3)
         .rs.restartR()
@@ -154,9 +154,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       }
 
 
-      killCPU <- function(bot, update){
+      killCPU <- function(bot, updates){
 
-        bot$sendMessage(chat_id = ID,
+        bot$sendMessage(chat_id =ID,
                         text = "Well that escalated quickly! CPU will shutdown in 10 sec.... Bye!")
         Shutdown()
       }
@@ -183,18 +183,18 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     # Msg Command
-    Msg <- function(bot, update){
+    Msg <- function(bot, updates){
 
-      bot$sendMessage(chat_id = ID,
+      bot$sendMessage(chat_id =ID,
                       text = glue::glue("\nConnection opened: {Sys.time()}"))
-      bot$get_updates(offset = update$update_id)
+      bot$get_updates(offset = updates$update_id)
     }
 
     Msg_handler <- telegram.bot::CommandHandler('Msg', Msg)
     dispatcher$add_handler(Msg_handler)
 
     message(glue::glue("\n=================\nOpening Connection with {Bot_Name} at {Sys.time()}.\n=================\nSee your phone's Telegram app for instructions...."))
-    updater$start_polling()
+    updater$start_polling(clean = T)
 
 
   } else {
@@ -230,20 +230,20 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     if(exists("Foo1")){
 
-      Handle_Func1 <- function( bot, update){
+      Handle_Func1 <- function( bot, updates){
 
         Result <- Foo1()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call1}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call1}"))
 
         }
@@ -257,19 +257,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo2")){
-      Handle_Func2 <- function( bot, update){
+      Handle_Func2 <- function( bot, updates){
         Result <- Foo2()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call2}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call2}"))
 
         }
@@ -280,19 +280,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo3")){
-      Handle_Func3 <- function( bot, update){
+      Handle_Func3 <- function( bot, updates){
         Result <- Foo3()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call3}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call3}"))
 
         }
@@ -302,19 +302,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       dispatcher$add_handler(Handle_Pass3)
     }
     if(exists("Foo4")){
-      Handle_Func4 <- function( bot, update){
+      Handle_Func4 <- function( bot, updates){
         Result <- Foo4()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call4}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call4}"))
 
         }
@@ -325,19 +325,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo5")){
-      Handle_Func5 <- function( bot, update){
+      Handle_Func5 <- function( bot, updates){
         Result <- Foo5()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call5}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call5}"))
 
         }
@@ -348,19 +348,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo6")){
-      Handle_Func6 <- function( bot, update){
+      Handle_Func6 <- function( bot, updates){
         Result <- Foo6()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call6}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call6}"))
 
         }
@@ -371,19 +371,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     }
     if(exists("Foo7")){
-      Handle_Func7 <- function( bot, update){
+      Handle_Func7 <- function( bot, updates){
         Result <- Foo7()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call7}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call7}"))
 
         }
@@ -395,19 +395,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo8")){
-      Handle_Func8 <- function( bot, update){
+      Handle_Func8 <- function( bot, updates){
         Result <- Foo8()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call8}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call8}"))
 
         }
@@ -419,19 +419,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo9")){
-      Handle_Func9 <- function( bot, update){
+      Handle_Func9 <- function( bot, updates){
         Result <- Foo9()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call9}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call9}"))
 
         }
@@ -443,19 +443,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     if(exists("Foo10")){
-      Handle_Func10 <- function( bot, update){
+      Handle_Func10 <- function( bot, updates){
         Result <- Foo10()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call10}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call10}"))
 
         }
@@ -468,19 +468,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo11")){
-      Handle_Func11 <- function( bot, update){
+      Handle_Func11 <- function( bot, updates){
         Result <- Foo11()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call11}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call11}"))
 
         }
@@ -493,19 +493,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo12")){
-      Handle_Func12 <- function( bot, update){
+      Handle_Func12 <- function( bot, updates){
         Result <- Foo12()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call12}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call12}"))
 
         }
@@ -518,19 +518,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo13")){
-      Handle_Func13 <- function( bot, update){
+      Handle_Func13 <- function( bot, updates){
         Result <- Foo13()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call13}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call13}"))
 
         }
@@ -543,19 +543,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo14")){
-      Handle_Func14 <- function( bot, update){
+      Handle_Func14 <- function( bot, updates){
         Result <- Foo14()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call14}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call14}"))
 
         }
@@ -568,19 +568,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo15")){
-      Handle_Func15 <- function( bot, update){
+      Handle_Func15 <- function( bot, updates){
         Result <- Foo15()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call15}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call15}"))
 
         }
@@ -593,19 +593,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo16")){
-      Handle_Func16 <- function( bot, update){
+      Handle_Func16 <- function( bot, updates){
         Result <- Foo16()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call16}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call16}"))
 
         }
@@ -618,19 +618,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo17")){
-      Handle_Func17 <- function( bot, update){
+      Handle_Func17 <- function( bot, updates){
         Result <- Foo17()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call17}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call17}"))
 
         }
@@ -643,19 +643,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo18")){
-      Handle_Func18 <- function( bot, update){
+      Handle_Func18 <- function( bot, updates){
         Result <- Foo18()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call18}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call18}"))
 
         }
@@ -668,19 +668,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo19")){
-      Handle_Func19 <- function( bot, update){
+      Handle_Func19 <- function( bot, updates){
         Result <- Foo19()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call19}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call19}"))
 
         }
@@ -693,19 +693,19 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
 
     if(exists("Foo20")){
-      Handle_Func20 <- function( bot, update){
+      Handle_Func20 <- function( bot, updates){
         Result <- Foo20()
 
         if(!is.null(Result$error)) {
 
-          # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("***ERROR Produced***: \n Function: {Call20}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
-          # # bot$get_updates(offset = update$update_id + 1)
-          bot$sendMessage(chat_id = ID,
+          bot$get_updates(offset = updates$update_id + 1)
+          bot$sendMessage(chat_id =ID,
                           text = glue::glue("Executed: {Call20}"))
 
         }
@@ -724,11 +724,12 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     # Handler function requires input of function name.
 
     # Kill Command
-    kill <- function(bot, update){
-
-      bot$sendMessage(chat_id = ID,
+    kill <- function(bot, updates){
+      message(glue("\n\nConnection Closed {Sys.time()}.\n\n"))
+      bot$get_updates(offset = updates$update_id + 1)
+      bot$sendMessage(chat_id =ID,
                       text = "\nBot Connection Closed Successfully\n")
-      bot$get_updates(offset = update$update_id + 1)
+
       # Stop the updater polling
       updater$stop_polling()
 
@@ -746,9 +747,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     #
     if(KillR) {
 
-      killR <- function(bot, update){
-
-        bot$sendMessage(chat_id = ID,
+      killR <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
                         text = "Your R session will now restart itself...Connection will be lost.\n Goodbye!")
         Sys.sleep(3)
         .rs.restartR()
@@ -770,9 +771,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       }
 
 
-      killCPU <- function(bot, update){
-
-        bot$sendMessage(chat_id = ID,
+      killCPU <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
                         text = "Well that escalated quickly! CPU will shutdown in 10 sec.... Bye!")
         Shutdown()
       }
@@ -799,18 +800,18 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     }
 
     # Msg Command
-    Msg <- function(bot, update){
+    Msg <- function(bot, updates){
 
-      bot$sendMessage(chat_id = ID,
+      bot$get_updates(offset = updates$update_id + 1)
+      bot$sendMessage(chat_id =ID,
                       text = glue::glue("\nConnection opened: {Sys.time()}"))
-      bot$get_updates(offset = update$update_id)
     }
 
     Msg_handler <- telegram.bot::CommandHandler('Msg', Msg)
     dispatcher$add_handler(Msg_handler)
 
     message(glue::glue("\n=================\nOpening Connection with {Bot_Name} at {Sys.time()}.\n=================\nSee your phone's Telegram app for instructions...."))
-    updater$start_polling()
+    updater$start_polling(clean = T)
 
   }
 
