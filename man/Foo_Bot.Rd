@@ -6,7 +6,7 @@
 \usage{
 Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
   Function_List = NULL, LoadMessage = "\\nConnection established with R\\n",
-  KillR = TRUE, KillCPU = FALSE)
+  KillR = TRUE, PokePC = TRUE, RestartCPU = FALSE, KillCPU = FALSE)
 }
 \arguments{
 \item{Bot_Name}{Name of the bot to do the sending.}
@@ -20,6 +20,10 @@ Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 \item{LoadMessage}{What to display on your phone when this call is initialised}
 
 \item{KillR}{Add option to kill R from your phone. Default to TRUE}
+
+\item{PokePC}{Ping the PC and check that your connection is still active. No side-effects, simple poke message returned.}
+
+\item{RestartCPU}{Force restarts the PC - no questions asked. Defaults to FALSE.}
 
 \item{KillCPU}{Add option to turn off your computer completely, no questions asked. Default to FALSE. Useful if working e.g. on a public CPU that you want to log out from remotely.}
 }

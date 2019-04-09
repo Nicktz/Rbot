@@ -10,7 +10,9 @@
 #' @param Token Token of your bot if not using the saved file call from Rbot::Add_Bot()
 #' @param Function_List Function_List containing for each function: The function to be called, the call handle, as well as the message sent to Telegram. Up to 20 functions can be added.
 #' @param LoadMessage What to display on your phone when this call is initialised
+#' @param PokePC Ping the PC and check that your connection is still active. No side-effects, simple poke message returned.
 #' @param KillR Add option to kill R from your phone. Default to TRUE
+#' @param RestartCPU Force restarts the PC - no questions asked. Defaults to FALSE.
 #' @param KillCPU Add option to turn off your computer completely, no questions asked. Default to FALSE. Useful if working e.g. on a public CPU that you want to log out from remotely.
 #' @importFrom purrr safely
 #' @importFrom telegram.bot Bot
@@ -73,7 +75,7 @@
 Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
                      Function_List = NULL,
                      LoadMessage = "\nConnection established with R\n",
-                     KillR = TRUE, KillCPU = FALSE) {
+                     KillR = TRUE, PokePC = TRUE, RestartCPU = FALSE, KillCPU = FALSE) {
 
 
   # Check location, Tokens and bot names...
@@ -127,6 +129,8 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     dispatcher$add_handler(kill_handler)
 
     #
+    PokePC_Msg <- ""
+    RestartPC_Msg <- ""
     KillR_Msg <- ""
     KillCPU_Msg <- ""
     #
@@ -146,6 +150,46 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     }
 
+    if(PokePC) {
+
+      Poke <- function () {
+        message(paste0("PC Poked at ", Sys.time()))
+      }
+
+
+      PokePC <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
+                        text = "PC has been poked - you are still connected...")
+        Poke()
+      }
+
+      PokePC_handler <- telegram.bot::CommandHandler('PokePC', PokePC)
+      dispatcher$add_handler(PokePC_handler)
+      PokePC_Msg <- "\n...........\nThis function will poke your PC to check that it is still connected (no side-effects, just a gentle poke...): \n * /PokePC\n"
+    }
+
+
+    if(RestartCPU) {
+
+      Rstart <- function () {
+        Sys.sleep(5)
+        shell("shutdown -r -t 0 -f")
+      }
+
+
+      RestartCPU <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
+                        text = "You've elected to restart your PC in 5 sec.... Bye!")
+        Rstart()
+      }
+
+      RestartPC_handler <- telegram.bot::CommandHandler('RestartCPU', RestartCPU)
+      dispatcher$add_handler(RestartPC_handler)
+      RestartPC_Msg <- "\n...........\nThis will force restart your computer (no questions asked...) by typing: \n * /RestartCPU\n"
+    }
+
     if(KillCPU) {
 
       Shutdown <- function () {
@@ -157,7 +201,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       killCPU <- function(bot, updates){
 
         bot$sendMessage(chat_id =ID,
-                        text = "Well that escalated quickly! CPU will shutdown in 10 sec.... Bye!")
+                        text = "Well that escalated quickly! CPU will force shutdown in 10 sec.... Bye!")
         Shutdown()
       }
 
@@ -169,7 +213,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     BotMsg <-
       LoadMessage
     BotMsg <-
-      glue::glue("\n {LoadMessage} \n\nYou have not provided bespoke functions to the connection, but you are able to switch the CPU off / force restart R from your phone.\nBy providing a list of functions to Foo_Bot, you can execute functions from your phone.\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
+      glue::glue("\n {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
 
 
     if(!is.null(Bot_Name)){
@@ -742,6 +786,8 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     #
     #
+    PokePC_Msg <- ""
+    RestartPC_Msg <- ""
     KillR_Msg <- ""
     KillCPU_Msg <- ""
     #
@@ -750,9 +796,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       killR <- function(bot, updates){
         bot$get_updates(offset = updates$update_id + 1)
         bot$sendMessage(chat_id =ID,
-                        text = "Your R session will now restart itself...Connection will be lost.\n Goodbye!")
+                        text = "Your R session will now quite...Connection will be lost.\n Goodbye!")
         Sys.sleep(3)
-        .rs.restartR()
+        q()
       }
 
       killR_handler <- telegram.bot::CommandHandler('killR', killR)
@@ -761,20 +807,59 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     }
 
+    if(PokePC) {
 
+      Poke <- function () {
+        message(paste0("PC Poked at ", Sys.time()))
+      }
+
+
+      PokePC <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
+                        text = "PC has been poked - you are still connected...")
+        Poke()
+      }
+
+      PokePC_handler <- telegram.bot::CommandHandler('PokePC', PokePC)
+      dispatcher$add_handler(PokePC_handler)
+      PokePC_Msg <- "\n...........\nThis function will poke your PC to check that it is still connected (no side-effects, just a gentle poke...): \n * /PokePC\n"
+    }
+
+
+
+    if(RestartCPU) {
+
+      Rstart <- function () {
+        Sys.sleep(5)
+        shell("shutdown -r -t 0 -f")
+      }
+
+
+      RestartCPU <- function(bot, updates){
+        bot$get_updates(offset = updates$update_id + 1)
+        bot$sendMessage(chat_id =ID,
+                        text = "You've elected to restart your PC in 5 sec.... Bye!")
+        Rstart()
+      }
+
+      RestartPC_handler <- telegram.bot::CommandHandler('RestartCPU', RestartCPU)
+      dispatcher$add_handler(RestartPC_handler)
+      RestartPC_Msg <- "\n...........\nThis will force restart your computer (no questions asked...) by typing: \n * /RestartCPU\n"
+    }
 
     if(KillCPU) {
 
       Shutdown <- function () {
-        Sys.sleep(10)
-        shell("shutdown -s -t 0")
+        Sys.sleep(5)
+        shell("shutdown -s -t 0 /f")
       }
 
 
       killCPU <- function(bot, updates){
         bot$get_updates(offset = updates$update_id + 1)
         bot$sendMessage(chat_id =ID,
-                        text = "Well that escalated quickly! CPU will shutdown in 10 sec.... Bye!")
+                        text = "Well that escalated quickly! CPU will shutdown in 5 sec.... Bye!")
         Shutdown()
       }
 
@@ -786,7 +871,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     BotMsg <-
       paste(unlist(MsgLog), collapse = "\n")
     BotMsg <-
-      glue::glue("\n {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
+      glue::glue("\n {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
 
 
     if(!is.null(Bot_Name)){
