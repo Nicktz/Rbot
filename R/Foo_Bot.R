@@ -18,6 +18,7 @@
 #' @importFrom telegram.bot Bot
 #' @importFrom telegram.bot Updater
 #' @importFrom telegram.bot CommandHandler
+#' @importFrom telegram.bot MessageHandler
 #' @importFrom glue glue
 #' @examples \dontrun{
 #' # Provide a Function_List with the the following inputs per function:
@@ -30,61 +31,76 @@
 #'
 #' Function_List <- list()
 #'
-#' First_Foo <- function(X){
+#'First_Foo <- function(X){
 #'
-#'    y <- 20*as.numeric(X)
-#'    print(y)
-#'    message("....Function 1 executed....")
+#'   Inputs <- eval(parse(text = X))
 #'
-#' }
+#'   Msg_Foo <- function(Arg1, Arg2, Arg3, TFalse) {
 #'
-#' Function_List$Foo1 <-
-#'    list(Function = First_Foo,
-#' # How to call your function from Telegram
-#'         Call = "F1",
-#'         Args = TRUE,
-#'         # What to say when executed in Telegram
-#' Message = "First function executed. This function sources the data fetch.")
+#'      if(TFalse == TRUE) message(paste(Arg1, Arg2, Arg3, sep = "/n"))
 #'
-#' Second_Foo <- function(X){
+#'   }
 #'
-#'    print(paste0("Your provided input: ", X) )
-#'    message("....Function 2 executed....")
+#'   Msg_Foo(Arg1 = Inputs["Arg1"],
+#'           Arg2 = Inputs["Arg2"],
+#'           Arg3 = Inputs["Arg3"],
+#'           TFalse = Inputs["TFalse"]
+#'   )
 #'
-#' }
+#'   message("R Msg: ....Function 1 executed....")
+#'
+#'}
+#'
+#'Function_List$Foo1 <-
+#'   list(Function = First_Foo,
+#'# How to call your function from Telegram
+#'        Call = "F1",
+#'        Args = TRUE,
+#'        # Describe Function in Telegram
+#'        Message = "Type four arguments as:\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\nPlan the function you source to fit this convention."
+#'   )
+#'
+#'Second_Foo <- function(X){
+#'
+#'   Inputs <- eval(parse(text = X))
+#'   print(paste0("Your provided input: ", Inputs) )
+#'   message("R Msg: ....Function 2 executed....")
+#'
+#'}
 #'
 #'
-#' Function_List$Foo2 <-
-#'    list(Function = Second_Foo,
-#'         Call = "F2",
-#'         Args = TRUE,
-#'         Message = "Report is now being built.")
+#'Function_List$Foo2 <-
+#'   list(Function = Second_Foo,
+#'        Call = "F2",
+#'        Args = TRUE,
+#'        # Describe Function in Telegram
+#'        Message = "Second Function Call...")
 #'
 #'
 #'
 #' Error_Foo <- function(){
-#'    x <- 0
-#'    if( is.infinite(10/x)) stop("Example of error being thrown, but not breaking connection...")
+#'   x <- 0
+#'   if( is.infinite(10/x)) stop("Example of error being thrown, but not breaking connection...")
 #'
-#' }
+#'}
 #'
-#' Function_List$Foo3 <-
-#'    list(Function = Error_Foo,
-#'         Call = "Error_Example",
-#'         Args = TRUE,
-#'         Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
-#'
+#'Function_List$Foo3 <-
+#'   list(Function = Error_Foo,
+#'        Call = "Error_Example",
+#'        Args = TRUE,
+#'        Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 #'
 #'
 #'
 #' Bot_Name <- "A"
 #' Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
-#'         KillR = TRUE, KillCPU = FALSE)
+#'        KillR = TRUE, KillCPU = FALSE)
 #'
 #' # Alternatively, no Function_List (implying only ability to switch off computer or killR, e.g.):
 #'
-#' Foo_Bot(Bot_Name = Bot_Name, Function_List = NULL, LoadMessage = "My connection with R",
-#'         KillR = TRUE, KillCPU = FALSE)
+#'# Foo_Bot(Bot_Name = Bot_Name, Function_List = NULL, LoadMessage = "My connection with R",
+#'#         KillR = TRUE, KillCPU = FALSE)
+#'
 #'
 #' }
 #' @export
@@ -223,7 +239,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     BotMsg <-
       LoadMessage
     BotMsg <-
-      glue::glue("\n {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
+      glue::glue("\nHi %s, {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
 
 
     if(!is.null(Bot_Name)){
@@ -247,16 +263,28 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     updater <- updater + telegram.bot::CommandHandler("Msg", Msg)
     message(glue::glue("\n=================\nOpening Connection with {Bot_Name} at {Sys.time()}.\n=================\nSee your phone's Telegram app for instructions...."))
 
+    Help <- function(bot, update){
+      bot$sendMessage(chat_id = update$message$chat_id,
+                      text = BotMsg)
+      bot$get_updates(offset = updates$update_id)
+    }
+
+    updater <- updater + telegram.bot::CommandHandler("Help", Help)
+
+    help <- function(bot, update){
+      bot$sendMessage(chat_id = update$message$chat_id,
+                      text = BotMsg)
+      bot$get_updates(offset = updates$update_id)
+    }
+
+    updater <- updater + telegram.bot::CommandHandler("help", help)
 
     unknown <- function(bot, update){
       bot$sendMessage(chat_id = update$message$chat_id,
-                      text = "Sorry, I did not understand that command (did you use / before the command?)\nPlease try again.")
+                      text = "Sorry, I did not understand that command (did you use / before the command?)\nPlease try again, or type /Help to see options.")
     }
 
-    updater <- updater + MessageHandler(unknown, MessageFilters$command)
-
-    updater$start_polling(clean = T)
-
+    updater <- updater + telegram.bot::MessageHandler(unknown, telegram.bot::MessageFilters$command)
 
   } else {
 
@@ -277,9 +305,9 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
       Args <- ifelse(is.null(Function_List[[i]]$Args), FALSE, Function_List[[i]]$Args)
       Msg <- Function_List[[i]]$Message
 
-      if(is.null(Foo) | !is.function(Foo)) stop("Each Function_List entry should have a valid function labelled as Function. See ?Foo_Bot example.")
-      if(is.null(Call) | !is.character(Call)) stop("Each Function_List entry should have a valid Call labelled as Call. See ?Foo_Bot example.")
-      if(is.null(Msg) | !is.character(Msg)) stop("Each Function_List entry should have a valid Message labelled as Message. See ?Foo_Bot example.")
+      if(is.null(Foo) | !is.function(Foo)) stop("Each Function_List entry should have a valid function labelled as Function. See ?Foo_Bot example in R.")
+      if(is.null(Call) | !is.character(Call)) stop("Each Function_List entry should have a valid Call labelled as Call. See ?Foo_Bot example in R.")
+      if(is.null(Msg) | !is.character(Msg)) stop("Each Function_List entry should have a valid Message labelled as Message. See ?Foo_Bot example in R.")
 
       assign(paste0("Foo", i), purrr::safely(Foo, otherwise = "FunctionFail")) # Ensure function is safe. Will alert if there is an error, not break connection.
       assign(paste0("Args", i), Args) # Ensure function is safe. Will alert if there is an error, not break connection.
@@ -298,7 +326,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args1) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call1}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call1}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo1(args)
           }
@@ -315,7 +343,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call1}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call1}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -325,7 +353,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call1, Handle_Func1, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call1, Handle_Func1, pass_args = TRUE)
     }
     if(exists("Foo2")){
       Handle_Func2 <- function( bot, updates, args){
@@ -333,7 +361,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args2) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call2}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call2}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo2(args)
           }
@@ -350,7 +378,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call2}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call2}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -360,7 +388,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call2, Handle_Func2, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call2, Handle_Func2, pass_args = TRUE)
     }
     if(exists("Foo3")){
       Handle_Func3 <- function( bot, updates, args){
@@ -368,7 +396,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args3) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call3}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call3}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo3(args)
           }
@@ -385,7 +413,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call3}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call3}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -395,7 +423,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call3, Handle_Func3, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call3, Handle_Func3, pass_args = TRUE)
     }
     if(exists("Foo4")){
       Handle_Func4 <- function( bot, updates, args){
@@ -403,7 +431,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args4) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call4}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call4}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo4(args)
           }
@@ -420,7 +448,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call4}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call4}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -430,7 +458,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call4, Handle_Func4, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call4, Handle_Func4, pass_args = TRUE)
     }
     if(exists("Foo5")){
       Handle_Func5 <- function( bot, updates, args){
@@ -438,7 +466,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args5) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call5}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call5}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo5(args)
           }
@@ -455,7 +483,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call5}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call5}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -465,7 +493,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call5, Handle_Func5, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call5, Handle_Func5, pass_args = TRUE)
     }
     if(exists("Foo6")){
       Handle_Func6 <- function( bot, updates, args){
@@ -473,7 +501,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args6) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call6}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call6}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo6(args)
           }
@@ -490,7 +518,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call6}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call6}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -500,7 +528,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call6, Handle_Func6, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call6, Handle_Func6, pass_args = TRUE)
     }
     if(exists("Foo7")){
       Handle_Func7 <- function( bot, updates, args){
@@ -508,7 +536,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args7) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call7}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call7}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo7(args)
           }
@@ -525,7 +553,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call7}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call7}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -535,7 +563,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call7, Handle_Func7, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call7, Handle_Func7, pass_args = TRUE)
     }
     if(exists("Foo8")){
       Handle_Func8 <- function( bot, updates, args){
@@ -543,7 +571,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args8) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call8}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call8}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo8(args)
           }
@@ -560,7 +588,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call8}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call8}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -570,7 +598,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call8, Handle_Func8, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call8, Handle_Func8, pass_args = TRUE)
     }
     if(exists("Foo9")){
       Handle_Func9 <- function( bot, updates, args){
@@ -578,7 +606,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args9) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call9}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call9}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo9(args)
           }
@@ -595,7 +623,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call9}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call9}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -605,7 +633,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call9, Handle_Func9, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call9, Handle_Func9, pass_args = TRUE)
     }
     if(exists("Foo10")){
       Handle_Func10 <- function( bot, updates, args){
@@ -613,7 +641,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args10) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call10}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call10}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo10(args)
           }
@@ -630,7 +658,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call10}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call10}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -640,7 +668,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call10, Handle_Func10, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call10, Handle_Func10, pass_args = TRUE)
     }
     if(exists("Foo11")){
       Handle_Func11 <- function( bot, updates, args){
@@ -648,7 +676,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args11) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call11}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call11}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo11(args)
           }
@@ -665,7 +693,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call11}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call11}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -675,7 +703,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call11, Handle_Func11, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call11, Handle_Func11, pass_args = TRUE)
     }
     if(exists("Foo12")){
       Handle_Func12 <- function( bot, updates, args){
@@ -683,7 +711,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args12) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call12}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call12}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo12(args)
           }
@@ -700,7 +728,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call12}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call12}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -710,7 +738,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call12, Handle_Func12, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call12, Handle_Func12, pass_args = TRUE)
     }
     if(exists("Foo13")){
       Handle_Func13 <- function( bot, updates, args){
@@ -718,7 +746,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args13) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call13}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call13}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo13(args)
           }
@@ -735,7 +763,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call13}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call13}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -745,7 +773,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call13, Handle_Func13, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call13, Handle_Func13, pass_args = TRUE)
     }
     if(exists("Foo14")){
       Handle_Func14 <- function( bot, updates, args){
@@ -753,7 +781,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args14) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call14}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call14}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo14(args)
           }
@@ -770,7 +798,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call14}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call14}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -780,7 +808,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call14, Handle_Func14, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call14, Handle_Func14, pass_args = TRUE)
     }
     if(exists("Foo15")){
       Handle_Func15 <- function( bot, updates, args){
@@ -788,7 +816,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args15) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call15}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call15}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo15(args)
           }
@@ -805,7 +833,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call15}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call15}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -815,7 +843,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call15, Handle_Func15, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call15, Handle_Func15, pass_args = TRUE)
     }
     if(exists("Foo16")){
       Handle_Func16 <- function( bot, updates, args){
@@ -823,7 +851,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args16) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call16}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call16}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo16(args)
           }
@@ -840,7 +868,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call16}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call16}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -850,7 +878,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call16, Handle_Func16, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call16, Handle_Func16, pass_args = TRUE)
     }
     if(exists("Foo17")){
       Handle_Func17 <- function( bot, updates, args){
@@ -858,7 +886,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args17) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call17}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call17}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo17(args)
           }
@@ -875,7 +903,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call17}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call17}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -885,7 +913,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call17, Handle_Func17, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call17, Handle_Func17, pass_args = TRUE)
     }
     if(exists("Foo18")){
       Handle_Func18 <- function( bot, updates, args){
@@ -893,7 +921,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args18) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call18}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call18}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo18(args)
           }
@@ -910,7 +938,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call18}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call18}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -920,7 +948,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call18, Handle_Func18, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call18, Handle_Func18, pass_args = TRUE)
     }
     if(exists("Foo19")){
       Handle_Func19 <- function( bot, updates, args){
@@ -928,7 +956,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args19) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call19}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call19}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo19(args)
           }
@@ -945,7 +973,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call19}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call19}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -955,7 +983,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call19, Handle_Func19, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call19, Handle_Func19, pass_args = TRUE)
     }
     if(exists("Foo20")){
       Handle_Func20 <- function( bot, updates, args){
@@ -963,7 +991,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args20) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call20}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call20}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo20(args)
           }
@@ -980,7 +1008,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call20}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call20}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -990,7 +1018,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call20, Handle_Func20, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call20, Handle_Func20, pass_args = TRUE)
     }
     if(exists("Foo21")){
       Handle_Func21 <- function( bot, updates, args){
@@ -998,7 +1026,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args21) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call21}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call21}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo21(args)
           }
@@ -1015,7 +1043,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call21}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call21}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1025,7 +1053,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call21, Handle_Func21, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call21, Handle_Func21, pass_args = TRUE)
     }
     if(exists("Foo22")){
       Handle_Func22 <- function( bot, updates, args){
@@ -1033,7 +1061,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args22) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call22}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call22}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo22(args)
           }
@@ -1050,7 +1078,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call22}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call22}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1060,7 +1088,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call22, Handle_Func22, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call22, Handle_Func22, pass_args = TRUE)
     }
     if(exists("Foo23")){
       Handle_Func23 <- function( bot, updates, args){
@@ -1068,7 +1096,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args23) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call23}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call23}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo23(args)
           }
@@ -1085,7 +1113,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call23}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call23}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1095,7 +1123,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call23, Handle_Func23, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call23, Handle_Func23, pass_args = TRUE)
     }
     if(exists("Foo24")){
       Handle_Func24 <- function( bot, updates, args){
@@ -1103,7 +1131,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args24) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call24}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call24}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo24(args)
           }
@@ -1120,7 +1148,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call24}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call24}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1130,7 +1158,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call24, Handle_Func24, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call24, Handle_Func24, pass_args = TRUE)
     }
     if(exists("Foo25")){
       Handle_Func25 <- function( bot, updates, args){
@@ -1138,7 +1166,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args25) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call25}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call25}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo25(args)
           }
@@ -1155,7 +1183,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call25}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call25}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1165,7 +1193,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call25, Handle_Func25, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call25, Handle_Func25, pass_args = TRUE)
     }
     if(exists("Foo26")){
       Handle_Func26 <- function( bot, updates, args){
@@ -1173,7 +1201,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args26) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call26}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call26}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo26(args)
           }
@@ -1190,7 +1218,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call26}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call26}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1200,7 +1228,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call26, Handle_Func26, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call26, Handle_Func26, pass_args = TRUE)
     }
     if(exists("Foo27")){
       Handle_Func27 <- function( bot, updates, args){
@@ -1208,7 +1236,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args27) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call27}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call27}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo27(args)
           }
@@ -1225,7 +1253,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call27}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call27}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1235,7 +1263,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call27, Handle_Func27, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call27, Handle_Func27, pass_args = TRUE)
     }
     if(exists("Foo28")){
       Handle_Func28 <- function( bot, updates, args){
@@ -1243,7 +1271,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args28) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call28}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call28}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo28(args)
           }
@@ -1260,7 +1288,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call28}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call28}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1270,7 +1298,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call28, Handle_Func28, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call28, Handle_Func28, pass_args = TRUE)
     }
     if(exists("Foo29")){
       Handle_Func29 <- function( bot, updates, args){
@@ -1278,7 +1306,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args29) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call29}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call29}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo29(args)
           }
@@ -1295,7 +1323,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call29}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call29}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1305,7 +1333,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call29, Handle_Func29, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call29, Handle_Func29, pass_args = TRUE)
     }
     if(exists("Foo30")){
       Handle_Func30 <- function( bot, updates, args){
@@ -1313,7 +1341,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
         if(Args30) {
           if (length(args) == 0L) {
             Result <- list()
-            Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Call30}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+            Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Call30}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
           } else {
             Result <- Foo30(args)
           }
@@ -1330,7 +1358,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
           bot$get_updates(offset = updates$update_id + 1)
           bot$sendMessage(chat_id =ID,
-                          text = glue::glue("***ERROR Produced***: \n Function: {Call30}\n\n * Error details:\n {Result$error}"))
+                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Call30}\n\n * Error details:\n {Result$error}"))
           message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
         } else {
 
@@ -1340,7 +1368,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
         }
       }
-      updater <- updater + CommandHandler(Call30, Handle_Func30, pass_args = TRUE)
+      updater <- updater + telegram.bot::CommandHandler(Call30, Handle_Func30, pass_args = TRUE)
     }
 
 
@@ -1350,7 +1378,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     #       if(Argsxxxx) {
     #          if (length(args) == 0L) {
     #             Result <- list()
-    #             Result$error <- glue::glue("=====> Function not executed as no arguments provided:\nFunction_List indicated that '/{Callxxxx}' requires arguments, but none was provided.\nEither:\n* Add Arguments or\n* Set Args = FALSE in Function_List")
+    #             Result$error <- glue::glue("No Arguments Provided:\nFunction_List indicated that '/{Callxxxx}' requires arguments, but none was provided.\nEither:\n* Add Function's Arguments (/Call arg)\n* Set Args = FALSE in Function_List\nSee ?Foo_Bot example in R\n************")
     #          } else {
     #             Result <- Fooxxxx(args)
     #          }
@@ -1367,7 +1395,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     #
     #          bot$get_updates(offset = updates$update_id + 1)
     #          bot$sendMessage(chat_id =ID,
-    #                          text = glue::glue("***ERROR Produced***: \n Function: {Callxxxx}\n\n * Error details:\n {Result$error}"))
+    #                          text = glue::glue("***Function ERROR (Connection still open)***: \n Function: /{Callxxxx}\n\n * Error details:\n {Result$error}"))
     #          message(glue::glue("\n***Function ERROR*** \n{Result$error}\n"))
     #       } else {
     #
@@ -1377,7 +1405,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     #
     #       }
     #    }
-    #    updater <- updater + CommandHandler(Callxxxx, Handle_Funcxxxx, pass_args = TRUE)
+    #    updater <- updater + telegram.bot::CommandHandler(Callxxxx, Handle_Funcxxxx, pass_args = TRUE)
     # }
 
 
@@ -1491,7 +1519,7 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
     BotMsg <-
       paste(unlist(MsgLog), collapse = "\n")
     BotMsg <-
-      glue::glue("\n {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
+      glue::glue("\nHi %s, {LoadMessage} \n\nFUNCTIONS:\n========================\n{BotMsg}\n\nGENERAL INSTRUCTIONS\n========================\nTo Kill this open port:\n * Type: /kill\n{PokePC_Msg}{RestartPC_Msg}{KillR_Msg}{KillCPU_Msg} \n ========================\nConnection opened: {Sys.time()} \n ========================")
 
 
     if(!is.null(Bot_Name)){
@@ -1516,16 +1544,31 @@ Foo_Bot <- function( Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
 
     message(glue::glue("\n=================\nOpening Connection with {Bot_Name} at {Sys.time()}.\n=================\nSee your phone's Telegram app for instructions...."))
 
-    unknown <- function(bot, update){
+    Help <- function(bot, update){
       bot$sendMessage(chat_id = update$message$chat_id,
-                      text = "Sorry, I did not understand that command (did you use / before the command?)\nPlease try again.")
+                      text = BotMsg)
+      bot$get_updates(offset = updates$update_id)
     }
 
-    updater <- updater + MessageHandler(unknown, MessageFilters$command)
+    updater <- updater + telegram.bot::CommandHandler("Help", Help)
 
-    updater$start_polling(clean = T)
+    help <- function(bot, update){
+      bot$sendMessage(chat_id = update$message$chat_id,
+                      text = BotMsg)
+      bot$get_updates(offset = updates$update_id)
+    }
+
+    updater <- updater + telegram.bot::CommandHandler("help", help)
+
+    unknown <- function(bot, update){
+      bot$sendMessage(chat_id = update$message$chat_id,
+                      text = "Sorry, I did not understand that command (did you use / before the command?)\nPlease try again, or type /Help to see options.")
+    }
+
+    updater <- updater + telegram.bot::MessageHandler(unknown, telegram.bot::MessageFilters$command)
 
   }
 
+  updater$start_polling(clean = T)
 
 }

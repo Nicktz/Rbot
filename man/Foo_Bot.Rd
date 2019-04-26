@@ -38,53 +38,86 @@ on your demand.
 }
 \examples{
 \dontrun{
-# Create function list to fill with your commands. Each function needs a Function, Call and Message. You will be alerted if one is missing.
+# Provide a Function_List with the the following inputs per function:
+
+# Function_List$Foo1, Function_List$Foo2, ... : can provide up to 30 functions
+# Function_List$Call : What to type in Telegram. Used as /Call in Telegram
+# Function_List$Args : TRUE / FALSE; whether to be able to include an argument. If excluded, it defaults to FALSE.
+# Function_List$Message : How to describe this function in Telegram.
+# Example below:
+
 Function_List <- list()
 
-First_Foo <- function(){
- x <- 10
- y <- 20
- print(x*y)
- message("....Function 1 executed....")
+First_Foo <- function(X){
+
+  Inputs <- eval(parse(text = X))
+
+  Msg_Foo <- function(Arg1, Arg2, Arg3, TFalse) {
+
+     if(TFalse == TRUE) message(paste(Arg1, Arg2, Arg3, sep = "/n"))
+
+  }
+
+  Msg_Foo(Arg1 = Inputs["Arg1"],
+          Arg2 = Inputs["Arg2"],
+          Arg3 = Inputs["Arg3"],
+          TFalse = Inputs["TFalse"]
+  )
+
+  message("R Msg: ....Function 1 executed....")
 
 }
 
 Function_List$Foo1 <-
- list(Function = First_Foo,
-      # How to call your function from Telegram
-      Call = "F1",
-      # What to say when executed in Telegram
-      Message = "First function executed. This function sources the data fetch.")
+  list(Function = First_Foo,
+# How to call your function from Telegram
+       Call = "F1",
+       Args = TRUE,
+       # Describe Function in Telegram
+       Message = "Type four arguments as:\\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\\nPlan the function you source to fit this convention."
+  )
 
-Second_Foo <- function(){
+Second_Foo <- function(X){
 
- x <- 100
- y <- 20
+  Inputs <- eval(parse(text = X))
+  print(paste0("Your provided input: ", Inputs) )
+  message("R Msg: ....Function 2 executed....")
 
- message("....Function 2 executed....")
 }
 
 
 Function_List$Foo2 <-
- list(Function = Second_Foo,
-      Call = "F2",
-      Message = "Report is now being built.")
+  list(Function = Second_Foo,
+       Call = "F2",
+       Args = TRUE,
+       # Describe Function in Telegram
+       Message = "Second Function Call...")
 
 
 
 Error_Foo <- function(){
- log(a)
- message("Example of error.")
+  x <- 0
+  if( is.infinite(10/x)) stop("Example of error being thrown, but not breaking connection...")
 
 }
 
-Function_List$FooError <-
- list(Function = Error_Foo,
-      Call = "Error_Example",
-      Message = "\\nError function illustrated: \\nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
+Function_List$Foo3 <-
+  list(Function = Error_Foo,
+       Call = "Error_Example",
+       Args = TRUE,
+       Message = "\\nError function illustrated: \\nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 
- Bot_Name <- "Gobot"
- Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
+
+
+Bot_Name <- "A"
+Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
        KillR = TRUE, KillCPU = FALSE)
+
+# Alternatively, no Function_List (implying only ability to switch off computer or killR, e.g.):
+
+# Foo_Bot(Bot_Name = Bot_Name, Function_List = NULL, LoadMessage = "My connection with R",
+#         KillR = TRUE, KillCPU = FALSE)
+
+
 }
 }

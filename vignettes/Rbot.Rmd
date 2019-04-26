@@ -219,78 +219,100 @@ By default, the path.expand("~") location will be used (run this in R to see whe
 
 If you prefer not to save your bots' Tokens on your computer, you could instead directly add your Bot's Token to each of the functions.
 
-
 ## Foo_Bot
 
-This function offers a simple workflow for developers to open a connection between Telegram on your phone and their R consoles. 
+This function offers a simple workflow for developers to open a connection between Telegram on your phone and their R consoles. You can plan functions with arguments to be sent from Telegram to R - allowing you to deploy production code remotely.
 
 > Note running this function implies your R session will be occupied (talking to Telegram). This can be stopped from your phone or your console, and is ideal for use on public computers or servers - where the ability to remotely control or shut down a computer is essential.
 
 The main idea behind this function is to allow you to execute a set of functions on your computer from your phone. If the function list is set to NULL (default), it simply allows the user to force switch off a computer or server at any time from your phone.
 
-Currently, the function allows you to have 20 functions, with your own calls, open for execution from your phone. 
+Currently, the function allows you to have 30 separate functions, with your own calls and arguments, open for execution from your phone. 
 
-The functions will be __safely__ executed, implying if there is an error, it will not interrupt your connection to the phone. Rather, it will show the error message on your phone, and allow you to keep the connection open. The ability to switch you computer off completely from your phone is particularly useful when running computers unattended (e.g. from public terminals).
+The functions will be __safely__ executed, implying if there is an error it will not interrupt your connection to the phone. Rather, it will show the error message on your phone, and allow you to keep the connection open. 
 
 Your ability to scale this function is limited only by your imagination - e.g. using it in a workflow run from a server where your connection to a bot is constantly open. From it, you could then initialise bash scripts from R, that in turn applies production functions, alerting you to progress from built in Text_Bot calls.
 
-Below I show a simple example, as well as an illustration of a workflow using __Foo_Bot__.
+Below I show a simple example, as well as an illustration of a workflow using __Foo_Bot__. Add a bot called 'A', and run the following chunk.
 
 ```{r}
 
-Function_List <- list()
+ # Provide a Function_List with the the following inputs per function:
 
-First_Foo <- function(){
-x <- 10
-y <- 20
-print(x*y)
-message("....Function 1 executed....")
+ # Function_List$Foo1, Function_List$Foo2, ... : can provide up to 30 functions
+ # Function_List$Call : What to type in Telegram. Used as /Call in Telegram
+ # Function_List$Args : TRUE / FALSE; whether to be able to include an argument. If excluded, it defaults to FALSE.
+ # Function_List$Message : How to describe this function in Telegram.
+ # Example below:
+
+ Function_List <- list()
+
+First_Foo <- function(X){
+   
+   Inputs <- eval(parse(text = X))
+   
+   Msg_Foo <- function(Arg1, Arg2, Arg3, TFalse) {
+      
+      if(TFalse == TRUE) message(paste(Arg1, Arg2, Arg3, sep = "/n"))
+      
+   }
+   
+   Msg_Foo(Arg1 = Inputs["Arg1"], 
+           Arg2 = Inputs["Arg2"],
+           Arg3 = Inputs["Arg3"],
+           TFalse = Inputs["TFalse"]
+   )
+   
+   message("R Msg: ....Function 1 executed....")
 
 }
 
 Function_List$Foo1 <-
-list(Function = First_Foo,
-     # How to call your function from Telegram
-     Call = "F1",  
-     # What to say when executed in Telegram
-     Message = "First function executed. This function sources the data fetch.")    
+   list(Function = First_Foo,
+# How to call your function from Telegram
+        Call = "F1",
+        Args = TRUE,
+        # Describe Function in Telegram
+        Message = "Type four arguments as:\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\nPlan the function you source to fit this convention."
+   )
 
-Second_Foo <- function(){
+Second_Foo <- function(X){
 
-x <- 100
-y <- 20
+  print(sqrt(as.numeric(X)) )
+  Rbot::Text_Bot(Msg = paste0("Answer: ", print(sqrt(as.numeric(X)) )), Bot_Name = "A")
+  message("R Msg: ....Function 2 executed....")
 
-message("....Function 2 executed....")
 }
-
 
 Function_List$Foo2 <-
-list(Function = Second_Foo,
-       Call = "F2",
-       Message = "Report is now being built.")
+   list(Function = Second_Foo,
+        Call = "F2",
+        Args = TRUE,
+        # Describe Function in Telegram
+        Message = "Second Function Call...Just add any argument")
 
-
-
-Error_Foo <- function(){
-log(a)
-message("Example of error.")
+ Error_Foo <- function(){
+   x <- 0
+   if( is.infinite(10/x)) stop("Example of error being thrown, but not breaking connection...")
 
 }
 
-Function_List$FooError <-
-list(Function = Error_Foo,
-     Call = "Error_Example", 
-     Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely") 
+Function_List$Foo3 <-
+   list(Function = Error_Foo,
+        Call = "Error_Example",
+        Args = TRUE,
+        Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 
 
+ Bot_Name <- "A"
+ Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
+        KillR = TRUE, KillCPU = FALSE)
 
- Bot_Name <- "Gobot"
- Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R", 
-         KillR = TRUE, KillCPU = FALSE)
+ # Alternatively, no Function_List (implying only ability to switch off computer or killR, e.g.):
 
- # To just have the ability to shut down R or your computer, set Function_List to NULL (or omit completely):    
- Foo_Bot(Bot_Name = Bot_Name, LoadMessage = "My connection with R", 
-         KillR = TRUE, KillCPU = FALSE)
+# Foo_Bot(Bot_Name = Bot_Name, Function_List = NULL, LoadMessage = "My connection with R",
+#         KillR = TRUE, KillCPU = FALSE)
+
     
 ```
 
@@ -302,6 +324,7 @@ list(Function = Error_Foo,
 * You can see e.g. when running the third function call: __/Error_Example__, it gives you an error, but keeps open the connection. 
 
 > Also note, you can restart R with KillR, or even switch off your computer completely by setting KillCPU to TRUE, and typing /killCPU. Take caution - this is a no questions asked shutdown of your pc - great for use on public computers where you are, e.g., downloading data from remotely.
+
 
 
 #### More
