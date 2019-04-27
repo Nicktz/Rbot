@@ -282,23 +282,21 @@ using **Foo\_Bot**. Add a bot called ‘A’, and run the following chunk.
  # Function_List$Message : How to describe this function in Telegram.
  # Example below:
 
- Function_List <- list()
+Function_List <- list()
 
+Bot_Name <- "A"
+ 
 First_Foo <- function(X){
    
    Inputs <- eval(parse(text = X))
    
    Msg_Foo <- function(Arg1, Arg2, Arg3, TFalse) {
       
-      if(TFalse == TRUE) message(paste(Arg1, Arg2, Arg3, sep = "/n"))
+      if(TFalse == TRUE) message(paste(Arg1, Arg2, Arg3, sep = "\n"))
       
    }
    
-   Msg_Foo(Arg1 = Inputs["Arg1"], 
-           Arg2 = Inputs["Arg2"],
-           Arg3 = Inputs["Arg3"],
-           TFalse = Inputs["TFalse"]
-   )
+   do.call("Msg_Foo", as.list( eval(parse( text = X))) ) 
    
    message("R Msg: ....Function 1 executed....")
 
@@ -315,10 +313,9 @@ Function_List$Foo1 <-
 
 Second_Foo <- function(X){
 
-  print(sqrt(as.numeric(X)) )
-  Rbot::Text_Bot(Msg = paste0("Answer: ", print(sqrt(as.numeric(X)) )), Bot_Name = "A")
-  message("R Msg: ....Function 2 executed....")
-
+   Answer <- sqrt(as.numeric(X))
+   Rbot::Text_Bot(Msg = glue::glue("Answer from Function : {Answer}"), Bot_Name = Bot_Name)
+   message(glue::glue("R Msg: ....Function 2 executed....\nAnswer = {Answer}"))
 }
 
 Function_List$Foo2 <-
@@ -326,12 +323,11 @@ Function_List$Foo2 <-
         Call = "F2",
         Args = TRUE,
         # Describe Function in Telegram
-        Message = "Second Function Call...Just add any argument")
-
+        Message = "Calculate square root of provided number.")
+ 
  Error_Foo <- function(){
    x <- 0
    if( is.infinite(10/x)) stop("Example of error being thrown, but not breaking connection...")
-
 }
 
 Function_List$Foo3 <-
@@ -341,7 +337,6 @@ Function_List$Foo3 <-
         Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 
 
- Bot_Name <- "A"
  Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
         KillR = TRUE, KillCPU = FALSE)
 
