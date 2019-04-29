@@ -174,70 +174,61 @@ on your demand.</p>
 
 <span class='no'>Function_List</span> <span class='kw'>&lt;-</span> <span class='fu'>list</span>()
 
+<span class='no'>Bot_Name</span> <span class='kw'>&lt;-</span> <span class='st'>"A"</span>
+
 <span class='no'>First_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>X</span>){
 
-  <span class='no'>Inputs</span> <span class='kw'>&lt;-</span> <span class='fu'>eval</span>(<span class='fu'>parse</span>(<span class='kw'>text</span> <span class='kw'>=</span> <span class='no'>X</span>))
+<span class='no'>Inputs</span> <span class='kw'>&lt;-</span> <span class='fu'>eval</span>(<span class='fu'>parse</span>(<span class='kw'>text</span> <span class='kw'>=</span> <span class='no'>X</span>))
 
-  <span class='no'>Msg_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>Arg1</span>, <span class='no'>Arg2</span>, <span class='no'>Arg3</span>, <span class='no'>TFalse</span>) {
+<span class='no'>Msg_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>Arg1</span>, <span class='no'>Arg2</span>, <span class='no'>Arg3</span>, <span class='no'>TFalse</span>) {
+<span class='kw'>if</span>(<span class='no'>TFalse</span> <span class='kw'>==</span> <span class='fl'>TRUE</span>) {
 
-     <span class='kw'>if</span>(<span class='no'>TFalse</span> <span class='kw'>==</span> <span class='fl'>TRUE</span>) <span class='fu'>message</span>(<span class='fu'>paste</span>(<span class='no'>Arg1</span>, <span class='no'>Arg2</span>, <span class='no'>Arg3</span>, <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>"/n"</span>))
-
-  }
-
-  <span class='fu'>Msg_Foo</span>(<span class='kw'>Arg1</span> <span class='kw'>=</span> <span class='no'>Inputs</span>[<span class='st'>"Arg1"</span>],
-          <span class='kw'>Arg2</span> <span class='kw'>=</span> <span class='no'>Inputs</span>[<span class='st'>"Arg2"</span>],
-          <span class='kw'>Arg3</span> <span class='kw'>=</span> <span class='no'>Inputs</span>[<span class='st'>"Arg3"</span>],
-          <span class='kw'>TFalse</span> <span class='kw'>=</span> <span class='no'>Inputs</span>[<span class='st'>"TFalse"</span>]
-  )
-
-  <span class='fu'>message</span>(<span class='st'>"R Msg: ....Function 1 executed...."</span>)
-
+ <span class='no'>Print_Msg</span> <span class='kw'>&lt;-</span> <span class='fu'>message</span>(<span class='fu'>paste</span>(<span class='no'>Arg1</span>, <span class='no'>Arg2</span>, <span class='no'>Arg3</span>, <span class='kw'>sep</span> <span class='kw'>=</span> <span class='st'>"\n"</span>))
+} <span class='kw'>else</span> {
+<span class='no'>Print_Msg</span> <span class='kw'>&lt;-</span> <span class='st'>"Selected FALSE"</span>
+}
+}
+<span class='no'>Print_Msg</span> <span class='kw'>&lt;-</span> <span class='fu'>do.call</span>(<span class='st'>"Msg_Foo"</span>, <span class='fu'>as.list</span>( <span class='fu'>eval</span>(<span class='fu'>parse</span>( <span class='kw'>text</span> <span class='kw'>=</span> <span class='no'>X</span>))) )
+<span class='fu'>print</span>(<span class='no'>Print_Msg</span>)
 }
 
 <span class='no'>Function_List</span>$<span class='no'>Foo1</span> <span class='kw'>&lt;-</span>
   <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>First_Foo</span>,
-<span class='co'># How to call your function from Telegram</span>
-       <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F1"</span>,
-       <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-       <span class='co'># Describe Function in Telegram</span>
-       <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Type four arguments as:\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\nPlan the function you source to fit this convention."</span>
-  )
+    <span class='co'># How to call your function from Telegram</span>
+    <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F1"</span>,
+    <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <span class='co'># Describe Function in Telegram</span>
+    <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Type four arguments as:\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\nPlan the function you source to fit this convention."</span>
+)
 
 <span class='no'>Second_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(<span class='no'>X</span>){
 
-  <span class='no'>Inputs</span> <span class='kw'>&lt;-</span> <span class='fu'>eval</span>(<span class='fu'>parse</span>(<span class='kw'>text</span> <span class='kw'>=</span> <span class='no'>X</span>))
-  <span class='fu'>print</span>(<span class='fu'>paste0</span>(<span class='st'>"Your provided input: "</span>, <span class='no'>Inputs</span>) )
-  <span class='fu'>message</span>(<span class='st'>"R Msg: ....Function 2 executed...."</span>)
-
+  <span class='no'>Answer</span> <span class='kw'>&lt;-</span> <span class='fu'>sqrt</span>(<span class='fu'>as.numeric</span>(<span class='no'>X</span>))
+<span class='kw pkg'>Rbot</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/Rbot/topics/Text_Bot'>Text_Bot</a></span>(<span class='kw'>Msg</span> <span class='kw'>=</span> <span class='kw pkg'>glue</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/glue/topics/glue'>glue</a></span>(<span class='st'>"Answer from Function : {Answer}"</span>), <span class='kw'>Bot_Name</span> <span class='kw'>=</span> <span class='no'>Bot_Name</span>)
+<span class='fu'>message</span>(<span class='kw pkg'>glue</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/glue/topics/glue'>glue</a></span>(<span class='st'>"R Msg: ....Function 2 executed....\nAnswer = {Answer}"</span>))
 }
 
-
 <span class='no'>Function_List</span>$<span class='no'>Foo2</span> <span class='kw'>&lt;-</span>
-  <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Second_Foo</span>,
-       <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F2"</span>,
-       <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-       <span class='co'># Describe Function in Telegram</span>
-       <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Second Function Call..."</span>)
-
-
+<span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Second_Foo</span>,
+<span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"F2"</span>,
+    <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <span class='co'># Describe Function in Telegram</span>
+    <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"Calculate square root of provided number."</span>)
 
 <span class='no'>Error_Foo</span> <span class='kw'>&lt;-</span> <span class='kw'>function</span>(){
   <span class='no'>x</span> <span class='kw'>&lt;-</span> <span class='fl'>0</span>
   <span class='kw'>if</span>( <span class='fu'>is.infinite</span>(<span class='fl'>10</span>/<span class='no'>x</span>)) <span class='fu'>stop</span>(<span class='st'>"Example of error being thrown, but not breaking connection..."</span>)
-
 }
 
 <span class='no'>Function_List</span>$<span class='no'>Foo3</span> <span class='kw'>&lt;-</span>
   <span class='fu'>list</span>(<span class='kw'>Function</span> <span class='kw'>=</span> <span class='no'>Error_Foo</span>,
-       <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"Error_Example"</span>,
-       <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-       <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely"</span>)
+     <span class='kw'>Call</span> <span class='kw'>=</span> <span class='st'>"Error_Example"</span>,
+    <span class='kw'>Args</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+    <span class='kw'>Message</span> <span class='kw'>=</span> <span class='st'>"\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely"</span>)
 
 
-
-<span class='no'>Bot_Name</span> <span class='kw'>&lt;-</span> <span class='st'>"A"</span>
 <span class='fu'>Foo_Bot</span>(<span class='kw'>Bot_Name</span> <span class='kw'>=</span> <span class='no'>Bot_Name</span>, <span class='kw'>Function_List</span> <span class='kw'>=</span> <span class='no'>Function_List</span>, <span class='kw'>LoadMessage</span> <span class='kw'>=</span> <span class='st'>"My connection with R"</span>,
-       <span class='kw'>KillR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>KillCPU</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+     <span class='kw'>KillR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>KillCPU</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
 <span class='co'># Alternatively, no Function_List (implying only ability to switch off computer or killR, e.g.):</span>
 
