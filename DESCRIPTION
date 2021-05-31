@@ -21,7 +21,7 @@ Imports:
     glue
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Repository: CRAN
 NeedsCompilation: yes
 ByteCompile: yes

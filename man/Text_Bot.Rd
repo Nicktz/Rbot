@@ -4,8 +4,7 @@
 \alias{Text_Bot}
 \title{Text_Bot}
 \usage{
-Text_Bot(Msg, Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
-  Silent = TRUE)
+Text_Bot(Msg, Bot_Name = NULL, Info_Loc = NULL, Token = NULL, Silent = TRUE)
 }
 \arguments{
 \item{Msg}{Message to send to your phone from R.}

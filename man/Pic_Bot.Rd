@@ -4,8 +4,14 @@
 \alias{Pic_Bot}
 \title{Pic_Bot}
 \usage{
-Pic_Bot(Img_Loc, Caption = "", Bot_Name = NULL, Info_Loc = NULL,
-  Token = NULL, Silent = TRUE)
+Pic_Bot(
+  Img_Loc,
+  Caption = "",
+  Bot_Name = NULL,
+  Info_Loc = NULL,
+  Token = NULL,
+  Silent = TRUE
+)
 }
 \arguments{
 \item{Img_Loc}{Image to send to your phone from R (e.g. a png file).}

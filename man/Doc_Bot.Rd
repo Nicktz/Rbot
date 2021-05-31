@@ -4,8 +4,13 @@
 \alias{Doc_Bot}
 \title{Doc_Bot}
 \usage{
-Doc_Bot(Doc_Location, Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
-  Silent = TRUE)
+Doc_Bot(
+  Doc_Location,
+  Bot_Name = NULL,
+  Info_Loc = NULL,
+  Token = NULL,
+  Silent = TRUE
+)
 }
 \arguments{
 \item{Doc_Location}{Document to send to your phone from R.}

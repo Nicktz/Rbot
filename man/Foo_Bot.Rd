@@ -4,9 +4,17 @@
 \alias{Foo_Bot}
 \title{Foo_Bot}
 \usage{
-Foo_Bot(Bot_Name = NULL, Info_Loc = NULL, Token = NULL,
-  Function_List = NULL, LoadMessage = "\\nConnection established with R\\n",
-  KillR = TRUE, PokePC = TRUE, RestartCPU = FALSE, KillCPU = FALSE)
+Foo_Bot(
+  Bot_Name = NULL,
+  Info_Loc = NULL,
+  Token = NULL,
+  Function_List = NULL,
+  LoadMessage = "\\nConnection established with R\\n",
+  KillR = TRUE,
+  PokePC = TRUE,
+  RestartCPU = FALSE,
+  KillCPU = FALSE
+)
 }
 \arguments{
 \item{Bot_Name}{Name of the bot to do the sending.}
@@ -57,7 +65,7 @@ Inputs <- eval(parse(text = X))
 Msg_Foo <- function(Arg1, Arg2, Arg3, TFalse) {
 if(TFalse == TRUE) {
 
- Print_Msg <- message(paste(Arg1, Arg2, Arg3, sep = "\\n"))
+ Print_Msg <- message(paste(Arg1, Arg2, Arg3, sep = "\n"))
 } else {
 Print_Msg <- "Selected FALSE"
 }
@@ -72,14 +80,14 @@ Function_List$Foo1 <-
     Call = "F1",
     Args = TRUE,
     # Describe Function in Telegram
-    Message = "Type four arguments as:\\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\\nPlan the function you source to fit this convention."
+    Message = "Type four arguments as:\nc(Arg1 = 'First Argument', Arg2 = 'Second Argument', Arg3 = 'Third and Last', TFalse = 'FALSE')\nPlan the function you source to fit this convention."
 )
 
 Second_Foo <- function(X){
 
   Answer <- sqrt(as.numeric(X))
 Rbot::Text_Bot(Msg = glue::glue("Answer from Function : {Answer}"), Bot_Name = Bot_Name)
-message(glue::glue("R Msg: ....Function 2 executed....\\nAnswer = {Answer}"))
+message(glue::glue("R Msg: ....Function 2 executed....\nAnswer = {Answer}"))
 }
 
 Function_List$Foo2 <-
@@ -98,7 +106,7 @@ Function_List$Foo3 <-
   list(Function = Error_Foo,
      Call = "Error_Example",
     Args = TRUE,
-    Message = "\\nError function illustrated: \\nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
+    Message = "\nError function illustrated: \nThis illustrates that the connection with the phone will  be preserved using purrr::safely")
 
 
 Foo_Bot(Bot_Name = Bot_Name, Function_List = Function_List, LoadMessage = "My connection with R",
